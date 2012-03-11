@@ -3,10 +3,10 @@ Two main principles have been taken from the 'wombat' theme:
 
 * reduced the contrast (gray shades) on some secondary groups:
   Comment, LineNr, VertSplit, StatusLine, TabLine  
-  => better code readability: the important parts stand out
+  => better code readability: the important parts stand out;
 * no more ugly yellow for Statement and Folded:
   Statement becomes blue, Folded becomes golden  
-  => should look nicer with most filetypes (especially html)
+  => should look nicer with most filetypes (especially HTML).
 
 The 256/88-color conversion has been made with the 'desert256' theme.
 I didn't keep the color conversion functions because they require too much CPU
