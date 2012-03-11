@@ -1,19 +1,17 @@
-This is a modified 'desert' theme with 256/88-color support.
-
+This is a modified 'desert' theme with 256/88-color support.  
 Two main principles have been taken from the 'wombat' theme:
 
 * reduced the contrast (gray shades) on some secondary groups:
-  Comment, LineNr, VertSplit, StatusLine, TabLine
+  Comment, LineNr, VertSplit, StatusLine, TabLine  
   => better code readability: the important parts stand out
-* no more ugly yellow for Statement and Folded
-  Statement becomes blue, Folded becomes golden
+* no more ugly yellow for Statement and Folded:
+  Statement becomes blue, Folded becomes golden  
   => should look nicer with most filetypes (especially html)
 
 The 256/88-color conversion has been made with the 'desert256' theme.
-I didn't keep the color conversion functions because:
-
-* they require too much CPU, a hardcoded conversion is faster
-* some fine tuning is necessary, especially in 88-color mode
+I didn't keep the color conversion functions because they require too much CPU
+(a hardcoded conversion is faster) and some fine tuning is necessary, especially
+in 88-color mode.
 
 These color modes have been tested in the following terminal emulators:
 
