@@ -1,10 +1,7 @@
 "|
-"| File          : ~/.vim/colors/kalahari.vim
-"| Last modified : 2012-03-11
-"| Project page  : https://github.com/fabi1cazenave/kalahari.vim
-"| Author        : Fabien Cazenave
-"| Licence       : WTFPL
-"| vim           : set fdm=marker:fmr=<<<,>>>:fdl=0:
+"| File    : ~/.vim/colors/kalahari.vim
+"| Source  : https://github.com/fabi1cazenave/kalahari.vim
+"| Licence : WTFPL
 "|
 "| This is a modified 'desert' theme with 256/88-color support.
 "|
@@ -35,6 +32,7 @@ if has("gui_running")
  "hi Cursor       guibg=khaki        guifg=slategrey
   hi Cursor       guifg=grey20       guibg=green
   hi CursorLine                      guibg=grey20     gui=none
+  hi ColorColumn                     guibg=grey20     gui=none
  "hi CursorIM
  "hi Directory
  "hi DiffAdd
@@ -81,6 +79,7 @@ if has("gui_running")
  "hi Statement    guifg=khaki
  "hi Statement    guifg=goldenrod
   hi Statement    guifg=#44aaff                       gui=bold
+  hi StorageClass guifg=SkyBlue
   hi PreProc      guifg=indianred
  "hi Type         guifg=darkkhaki
   hi Type         guifg=goldenrod                     gui=none
@@ -96,21 +95,20 @@ if has("gui_running")
 elseif &t_Co == 256
   hi Normal       ctermfg=255  ctermbg=234
   hi NonText      ctermfg=152  ctermbg=235  cterm=bold
- "hi NonText      ctermfg=152  ctermbg=238  cterm=bold
- "hi NonText      ctermfg=152  ctermbg=16   cterm=bold
 
   " highlight groups <<<
   hi Cursor       ctermfg=66   ctermbg=222
  "hi CursorColumn ctermbg=242
-  hi CursorLine                ctermbg=237  cterm=none
+  hi CursorLine                ctermbg=236  cterm=none
+  hi ColorColumn               ctermbg=235  cterm=none
  "hi DiffAdd      ctermbg=4
  "hi DiffChange   ctermbg=5
  "hi DiffDelete   ctermfg=12   ctermbg=6
  "hi DiffText     ctermbg=9                 cterm=bold
  "hi Directory    ctermfg=159
  "hi ErrorMsg     ctermfg=15   ctermbg=1
-  hi FoldColumn   ctermfg=180  ctermbg=239
-  hi Folded       ctermfg=180  ctermbg=239
+  hi FoldColumn   ctermfg=243  ctermbg=237
+  hi Folded       ctermfg=243  ctermbg=237
   hi IncSearch    ctermfg=66   ctermbg=222  cterm=reverse
   hi LineNr       ctermfg=244
  "hi MatchParen   ctermbg=6
@@ -122,24 +120,26 @@ elseif &t_Co == 256
  "hi PmenuThumb                             cterm=reverse
   hi Question     ctermfg=48                cterm=bold
   hi Search       ctermfg=223  ctermbg=172
- "hi SignColumn   ctermfg=14   ctermbg=242
+  hi SignColumn   ctermfg=118  ctermbg=235
   hi SpecialKey   ctermfg=111
  "hi SpellBad     ctermbg=9
  "hi SpellCap     ctermbg=12
  "hi SpellLocal   ctermbg=14
  "hi SpellRare    ctermbg=13
   hi StatusLine   ctermfg=145  ctermbg=16   cterm=reverse,bold
- "hi StatusLineNC ctermfg=145  ctermbg=243  cterm=none
-  hi StatusLineNC ctermfg=0    ctermbg=243  cterm=none
-  hi TabLine      ctermfg=15   ctermbg=239  cterm=underline
-  hi TabLineFill               ctermbg=239  cterm=none
+ "hi StatusLineNC ctermfg=145  ctermbg=240  cterm=none
+  hi StatusLineNC ctermfg=0    ctermbg=240  cterm=none
+  hi TabLine      ctermfg=250  ctermbg=237  cterm=underline
+  hi TabLineFill               ctermbg=237  cterm=none
  "hi TabLineFill               ctermbg=250  cterm=none
  "hi TabLineSel   ctermfg=167  ctermbg=238
  "hi TabLineSel                             cterm=bold
   hi Title        ctermfg=167               cterm=bold
-  hi VertSplit    ctermfg=238  ctermbg=243  cterm=none
-  hi Visual       ctermfg=64   ctermbg=222  cterm=reverse
- "hi VisualNOS                              cterm=bold,underline
+  hi VertSplit    ctermfg=238  ctermbg=240  cterm=none
+ "hi Visual       ctermfg=64   ctermbg=222  cterm=reverse
+ "hi Visual       ctermfg=32   ctermbg=222  cterm=reverse
+  hi Visual       ctermfg=254  ctermbg=68
+  hi VisualNOS                              cterm=bold,underline
   hi WarningMsg   ctermfg=209
  "hi WildMenu     ctermfg=0    ctermbg=11
   ">>>
@@ -158,6 +158,7 @@ elseif &t_Co == 256
  "hi Statement    ctermfg=117               cterm=bold
  "hi Statement    ctermfg=45                cterm=bold
   hi Statement    ctermfg=39                cterm=bold
+  hi StorageClass ctermfg=117
  "hi Todo         ctermfg=196  ctermbg=226
  "hi Todo         ctermfg=217  ctermbg=196
   hi Todo         ctermfg=255  ctermbg=167
@@ -175,6 +176,7 @@ elseif &t_Co == 88
   " highlight groups <<<
   hi Cursor       ctermfg=12   ctermbg=77
   hi CursorLine                ctermbg=81   cterm=none
+  hi ColorColumn               ctermbg=81   cterm=none
   hi FoldColumn   ctermfg=57   ctermbg=80
  "hi Folded       ctermfg=72   ctermbg=80
   hi Folded       ctermfg=53   ctermbg=80
@@ -208,6 +210,7 @@ elseif &t_Co == 88
   hi Special      ctermfg=74
  "hi Statement    ctermfg=77                cterm=bold
   hi Statement    ctermfg=52                cterm=bold
+ "hi StorageClass ctermfg=117
   hi Todo         ctermfg=68   ctermbg=76
   hi Type         ctermfg=57                cterm=bold
   ">>>
@@ -243,6 +246,7 @@ else
   hi Statement    ctermfg=3
   hi StatusLine                                     cterm=bold,reverse
   hi StatusLineNC                                   cterm=reverse
+  hi StorageClass ctermfg=darkcyan
   hi Title        ctermfg=5
   hi Type         ctermfg=2
   hi Underlined   ctermfg=5                         cterm=underline
@@ -254,4 +258,4 @@ else
 endif
 ">>>
 
-" vim: set foldmethod=marker foldmarker=<<<,>>> foldlevel=0:
+" vim: set fdm=marker fmr=<<<,>>> fdl=0:
