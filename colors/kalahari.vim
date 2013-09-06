@@ -109,7 +109,10 @@ elseif &t_Co == 256
  "hi ErrorMsg     ctermfg=15   ctermbg=1
   hi FoldColumn   ctermfg=243  ctermbg=237
   hi Folded       ctermfg=243  ctermbg=237
-  hi IncSearch    ctermfg=66   ctermbg=222  cterm=reverse
+ "hi IncSearch    ctermfg=66   ctermbg=222  cterm=reverse
+ "hi Search       ctermfg=223  ctermbg=172
+  hi IncSearch    ctermfg=62   ctermbg=222  cterm=reverse
+  hi Search       ctermfg=223  ctermbg=61
   hi LineNr       ctermfg=244
  "hi MatchParen   ctermbg=6
   hi ModeMsg      ctermfg=178               cterm=bold
@@ -119,7 +122,6 @@ elseif &t_Co == 256
  "hi PmenuSel     ctermbg=242
  "hi PmenuThumb                             cterm=reverse
   hi Question     ctermfg=48                cterm=bold
-  hi Search       ctermfg=223  ctermbg=172
   hi SignColumn   ctermfg=118  ctermbg=235
   hi SpecialKey   ctermfg=111
  "hi SpellBad     ctermbg=9
