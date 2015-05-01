@@ -53,10 +53,10 @@ if has("gui_running") || &t_Co == 256
   hi Question     ctermfg=48                cterm=bold
   hi SignColumn   ctermfg=118  ctermbg=235
   hi SpecialKey   ctermfg=111
- "hi SpellBad     ctermbg=9
- "hi SpellCap     ctermbg=12
- "hi SpellLocal   ctermbg=14
- "hi SpellRare    ctermbg=13
+  hi SpellBad     ctermbg=237
+  hi SpellCap     ctermbg=238
+  hi SpellLocal   ctermbg=238
+  hi SpellRare    ctermbg=238
   hi StatusLine   ctermfg=145  ctermbg=16   cterm=reverse,bold
   hi StatusLineNC ctermfg=0    ctermbg=240  cterm=none
   hi TabLine      ctermfg=250  ctermbg=237  cterm=underline
