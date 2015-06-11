@@ -29,13 +29,13 @@ if has("gui_running") || &t_Co == 256
 
   " highlight groups <<<
   hi Cursor       ctermfg=66   ctermbg=222
- "hi CursorColumn ctermbg=242
+ "hi CursorColumn              ctermbg=242
   hi CursorLine                ctermbg=236  cterm=none
   hi ColorColumn               ctermbg=235  cterm=none
- "hi DiffAdd      ctermbg=4
- "hi DiffChange   ctermbg=5
+ "hi DiffAdd                   ctermbg=4
+ "hi DiffChange                ctermbg=5
  "hi DiffDelete   ctermfg=12   ctermbg=6
- "hi DiffText     ctermbg=9                 cterm=bold
+ "hi DiffText                  ctermbg=9    cterm=bold
  "hi Directory    ctermfg=159
  "hi ErrorMsg     ctermfg=15   ctermbg=1
   hi FoldColumn   ctermfg=243  ctermbg=237
@@ -43,7 +43,7 @@ if has("gui_running") || &t_Co == 256
   hi IncSearch    ctermfg=62   ctermbg=222  cterm=reverse
   hi Search       ctermfg=223  ctermbg=61
   hi LineNr       ctermfg=244
- "hi MatchParen   ctermbg=6
+ "hi MatchParen                ctermbg=6
   hi ModeMsg      ctermfg=178               cterm=bold
   hi MoreMsg      ctermfg=29
   hi Pmenu        ctermfg=4    ctermbg=232
@@ -53,10 +53,11 @@ if has("gui_running") || &t_Co == 256
   hi Question     ctermfg=48                cterm=bold
   hi SignColumn   ctermfg=118  ctermbg=235
   hi SpecialKey   ctermfg=111
- "hi SpellBad     ctermbg=9
- "hi SpellCap     ctermbg=12
- "hi SpellLocal   ctermbg=14
- "hi SpellRare    ctermbg=13
+  hi SpellBad     ctermfg=250  ctermbg=235  cterm=underline
+ "hi SpellBad                  ctermbg=9
+ "hi SpellCap                  ctermbg=12
+ "hi SpellLocal                ctermbg=14
+ "hi SpellRare                 ctermbg=13
   hi StatusLine   ctermfg=145  ctermbg=16   cterm=reverse,bold
   hi StatusLineNC ctermfg=0    ctermbg=240  cterm=none
   hi TabLine      ctermfg=250  ctermbg=237  cterm=underline
