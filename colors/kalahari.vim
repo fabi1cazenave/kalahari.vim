@@ -3,15 +3,20 @@
 "| Source  : https://github.com/fabi1cazenave/kalahari.vim
 "| Licence : WTFPL
 "|
-"| This is a modified 'desert' theme with 256/88-color support.
+"| This is a modified 'desert' theme with 256/88-color support
+"| and a 'light' variant in 256-color mode. Use `:set bg={dark,light}`.
 "|
 
 hi clear
 if exists("syntax_on")
   syntax reset
 endif
-set background=dark
 let g:colors_name="kalahari"
+
+let s:dark = 0
+if &background ==# 'dark'
+  let s:dark=1
+endif
 
 " source this file on save to apply all changes immediately {{{
 if has("autocmd")
@@ -20,6 +25,7 @@ endif " }}}
 
 " 8bit-to-24bit color converter {{{
 " 3 color groups: 0-15 (ANSI), 16-87, 88-256
+" (note that the ANSI colors are handled by the terminal emulator, not by Vim)
 " https://jonasjacek.github.io/colors/
 let s:rgb = [
 \
@@ -89,113 +95,152 @@ endfunction
 " 256-color mode, adapted from 'desert256' {{{
 if has('gui_running') || has('termguicolors') || &t_Co == 256
 
-  " grey scale
-  let s:bg_0       = 16  " #000000
-  let s:bg_1       = 232
-  let s:bg_2       = 233
-  let s:bg_3       = 234
-  let s:bg_4       = 235
-  let s:bg_5       = 236
-  let s:bg_6       = 237
-  let s:bg_7       = 238
-  let s:bg_8       = 239
-  let s:bg_9       = 240
-  let s:bg_10      = 241
-  let s:bg_11      = 242
-  let s:bg_12      = 243
-  let s:fg_0       = 231 " #ffffff
-  let s:fg_1       = 255
-  let s:fg_2       = 254
-  let s:fg_3       = 253
-  let s:fg_4       = 252
-  let s:fg_5       = 251
-  let s:fg_6       = 250
-  let s:fg_7       = 249
-  let s:fg_8       = 248
-  let s:fg_9       = 247
-  let s:fg_10      = 246
-  let s:fg_11      = 245
-  let s:fg_12      = 244
+  " grey scale {{{
+  let s:grey_0       = 16  " #000000
+  let s:grey_4       = 232 " #080808
+  let s:grey_8       = 233 " #121212
+  let s:grey_12      = 234 " #1c1c1c
+  let s:grey_16      = 235 " #262626
+  let s:grey_20      = 236 " #303030
+  let s:grey_24      = 237 " #3a3a3a
+  let s:grey_28      = 238 " #444444
+  let s:grey_32      = 239 " #4e4e4e
+  let s:grey_36      = 240 " #585858
+  let s:grey_40      = 241 " #626262
+  let s:grey_44      = 242 " #6c6c6c
+  let s:grey_48      = 243 " #767676
+  let s:grey_52      = 244 " #808080
+  let s:grey_56      = 245 " #8a8a8a
+  let s:grey_60      = 246 " #949494
+  let s:grey_64      = 247 " #9e9e9e
+  let s:grey_68      = 248 " #a8a8a8
+  let s:grey_72      = 249 " #b2b2b2
+  let s:grey_76      = 250 " #bcbcbc
+  let s:grey_80      = 251 " #c6c6c6
+  let s:grey_84      = 252 " #d0d0d0
+  let s:grey_88      = 253 " #dadada
+  let s:grey_92      = 254 " #e4e4e4
+  let s:grey_96      = 255 " #eeeeee
+  let s:grey_100     = 231 " #ffffff
+  " }}}
 
-  " UI palette
-  let s:Normal     = s:fg_1
-  let s:Normal_bg  = s:bg_3
-  let s:NonText    = 152
-  let s:NonText_bg = s:bg_4
+  " default text & separators {{{
+  " low number means high contrast, high number means low contrast
+  if s:dark
+    let s:fg_1 = s:grey_92 " default text
+    let s:fg_2 = s:grey_88
+    let s:fg_3 = s:grey_76
+    let s:fg_4 = s:grey_64
+    let s:fg_5 = s:grey_36
+    let s:bg_1 = s:grey_4  " default background
+    let s:bg_2 = s:grey_8
+    let s:bg_3 = s:grey_20
+    let s:bg_4 = s:grey_24
+    let s:bg_5 = s:grey_36
+  else
+    let s:fg_1 = s:grey_16 " default text
+    let s:fg_2 = s:grey_20
+    let s:fg_3 = s:grey_32
+    let s:fg_4 = s:grey_44
+    let s:fg_5 = s:grey_72
+    let s:bg_1 = s:grey_96 " default background
+    let s:bg_2 = s:grey_92
+    let s:bg_3 = s:grey_88
+    let s:bg_4 = s:grey_84
+    let s:bg_5 = s:grey_72
+  endif
+  " }}}
 
-  " syntax palette
-  let s:Comment    = s:fg_9
-  let s:Constant   = 217
-  let s:Identifier = 120
-  let s:Statement  = 39
-  let s:PreProc    = 167
-  let s:Type       = 178
-  let s:Special    = 223
-  let s:Underlined = 81
-  let s:Ignore     = 240
-  let s:Error      = 15
-  let s:Error_bg   = 9
-  let s:Todo       = 255
-  let s:Todo_bg    = 167
+  " UI palette {{{
+  if s:dark
+    let s:NonText    = 152
+  else
+    let s:NonText    = 36
+  endif
+  let s:Visual       = 68
+  let s:Cursor       = 66
+  let s:Cursor_bg    = 222
+  " }}}
 
-  call HL('Normal',        s:fg_1, s:bg_3,  '')
-  call HL('NormalNC',      -1,     -1,      '')
-
-  call HL('NonText',       152,    s:bg_4,  'bold')
-  call HL('EndOfBuffer',   -1,     -1,      '')
+  " syntax palette {{{
+  if s:dark
+    let s:Constant   = 217
+    let s:Identifier = 120
+    let s:Statement  = 39
+    let s:PreProc    = 167
+    let s:Type       = 178
+    let s:Special    = 223
+  else
+    let s:Constant   = 168
+    let s:Identifier = 29
+    let s:Statement  = 21
+    let s:PreProc    = 167
+    let s:Type       = 166
+    let s:Special    = 179
+  endif
+  let s:Comment      = s:fg_4
+  let s:Underlined   = 81
+  let s:Ignore       = 240
+  let s:Error        = 15
+  let s:Error_bg     = 9
+  let s:Todo         = 255
+  let s:Todo_bg      = 167
+  " }}}
 
   " UI groups, see `:help highlight-groups` {{{
-  call HL('ColorColumn',   -1,      s:bg_4,  'none')
-  call HL('Conceal',       -1,      -1,      '')
-  call HL('Cursor',        66,      222,     '')
- "call HL('CursorIM',      66,      222,     '')
- "call HL('CursorColumn',  -1,      s:bg_11, '')
-  call HL('CursorLine',    -1,      s:bg_5,  'none')
- "call HL('Directory',     159,     -1,      '')
- "call HL('DiffAdd',       -1,      4,       '')
- "call HL('DiffChange',    -1,      5,       '')
- "call HL('DiffDelete',    12,      6,       '')
- "call HL('DiffText',      -1,      9,       'bold')
-  call HL('TermCursor',    66,      222,     '')
-  call HL('TermCursorNC',  66,      222,     '')
- "call HL('ErrorMsg',      15,      1,       '')
-  call HL('VertSplit',     s:bg_7,  s:bg_9,  'none')
-  call HL('Folded',        s:bg_12, s:bg_6,  '')
-  call HL('FoldColumn',    s:bg_12, s:bg_6,  '')
-  call HL('SignColumn',    118,     s:bg_4,  '')
-  call HL('IncSearch',     62,      222,     'reverse')
-  call HL('Substitute',    -1,      -1,      '')
-  call HL('LineNr',        s:fg_12, -1,      '')
-  call HL('CursorLineNr',  s:fg_12, -1,      '')
- "call HL('MatchParen',    -1,       6,      '')
-  call HL('ModeMsg',       178,     -1,      'bold')
-  call HL('MsgSeparator',  -1,      -1,      '')
-  call HL('MoreMsg',       29,      -1,      '')
-  call HL('Pmenu',         4,       s:bg_1,  '')
-  call HL('PmenuSel',      s:fg_4,  s:bg_4,  'bold')
-  call HL('PmenuSbar',     -1,      s:bg_3,  '')
-  call HL('PmenuThumb',    -1,      s:bg_6,  '')
-  call HL('Question',      48,      -1,      'bold')
-  call HL('QuickFixLine',  -1,      -1,      '')
-  call HL('Search',        223,     61,      '')
-  call HL('SpecialKey',    111,     -1,      '')
-  call HL('SpellBad',      s:fg_6,  s:bg_4,  'undercurl')
- "call HL('SpellBad',      -1,      9,       '')
- "call HL('SpellCap',      -1,      12,      '')
- "call HL('SpellLocal',    -1,      14,      '')
- "call HL('SpellRare',     -1,      13,      '')
-  call HL('StatusLine',    145,     16,      'reverse,bold')
-  call HL('StatusLineNC',  0,       s:bg_9,  'none')
-  call HL('TabLine',       s:fg_6,  s:bg_6,  'underline')
-  call HL('TabLineFill',   -1,      s:bg_6,  'none')
- "call HL('TabLineSel',    167,     s:bg_7,  '')
- "call HL('TabLineSel',    -1,      -1,      'bold')
-  call HL('Title',         167,     -1,      'bold')
-  call HL('Visual',        s:fg_2,  68,      '')
-  call HL('VisualNOS',     -1,      -1,      'bold,underline')
-  call HL('WarningMsg',    209,     -1,      '')
-  call HL('Whitespace',    s:bg_9,  -1,      '')
- "call HL('WildMenu',      0,       11,      '')
+  call HL('ColorColumn',     -1,            s:bg_2,        'none')
+  call HL('Conceal',         -1,            -1,            '')
+  call HL('Cursor',          s:Cursor,      s:Cursor_bg,   '')
+  call HL('CursorIM',        -1,            -1,            '')
+  call HL('CursorColumn',    -1,            s:bg_3,        '')
+  call HL('CursorLine',      -1,            s:bg_3,        'none')
+ "call HL('Directory',       159,           -1,            '')
+ "call HL('DiffAdd',         -1,            4,             '')
+ "call HL('DiffChange',      -1,            5,             '')
+ "call HL('DiffDelete',      12,            6,             '')
+ "call HL('DiffText',        -1,            9,             'bold')
+  call HL('EndOfBuffer',     -1,            -1,            '') " same as NonText
+  call HL('TermCursor',      s:Cursor,      s:Cursor_bg,   '')
+  call HL('TermCursorNC',    s:Cursor,      s:Cursor_bg,   '')
+  call HL('ErrorMsg',        s:Error,       s:Error_bg,    '')
+  call HL('VertSplit',       s:fg_5,        s:bg_4,        'none')
+  call HL('Folded',          s:fg_4,        s:bg_3,        '')
+  call HL('FoldColumn',      -1,            s:bg_3,        '')
+  call HL('SignColumn',      118,           s:bg_3,        '')
+  call HL('IncSearch',       62,            s:Cursor_bg,   'reverse')
+  call HL('Substitute',      -1,            -1,            '')
+  call HL('LineNr',          s:fg_5,        -1,            '')
+  call HL('CursorLineNr',    s:fg_5,        -1,            '')
+  call HL('MatchParen',      -1,            s:Visual,      '')
+  call HL('ModeMsg',         178,           -1,            'bold')
+  call HL('MsgSeparator',    -1,            -1,            '')
+  call HL('MoreMsg',         29,            -1,            '')
+  call HL('NonText',         s:NonText,     s:bg_2,        'bold')
+  call HL('Normal',          s:fg_1,        s:bg_1,        '')
+  call HL('NormalNC',        -1,            -1,            '')
+  call HL('Pmenu',           s:fg_2,        s:bg_4,        '')
+  call HL('PmenuSel',        s:fg_2,        s:bg_5,        'bold')
+  call HL('PmenuSbar',       -1,            s:bg_3,        '')
+  call HL('PmenuThumb',      -1,            s:bg_4,        '')
+  call HL('Question',        48,            -1,            'bold')
+  call HL('QuickFixLine',    -1,            -1,            '')
+  call HL('Search',          223,           61,            '')
+  call HL('SpecialKey',      111,           -1,            '')
+  call HL('SpellBad',        s:fg_3,        s:bg_3,        'undercurl')
+ "call HL('SpellCap',        -1,            12,            '')
+ "call HL('SpellLocal',      -1,            14,            '')
+ "call HL('SpellRare',       -1,            13,            '')
+  call HL('StatusLine',      s:fg_4,        s:bg_1,        'reverse')
+  call HL('StatusLineNC',    s:fg_4,        s:bg_4,        'none')
+  call HL('TabLine',         s:fg_3,        s:bg_4,        'underline')
+  call HL('TabLineFill',     -1,            s:bg_4,        'none')
+  call HL('TabLineSel',      s:fg_1,        s:bg_1,        'bold')
+  call HL('Title',           s:fg_1,        -1,            'bold')
+  call HL('Visual',          s:fg_1,        s:Visual,      '')
+  call HL('VisualNOS',       -1,            -1,            'bold,underline')
+  call HL('WarningMsg',      209,           -1,            '')
+  call HL('Whitespace',      s:fg_4,        -1,            '')
+  call HL('WildMenu',        -1,            s:Visual,      'bold')
   "}}}
 
   " standard syntax groups, see `:help group-name` {{{
@@ -243,7 +288,7 @@ if has('gui_running') || has('termguicolors') || &t_Co == 256
   call HL('vimFuncName',     s:Identifier,  -1, '')
   call HL('vimHighlight',    s:Statement,   -1, '')
   call HL('vimLineComment',  s:Comment,     -1, 'italic')
-  call HL('vimParenSep',     s:fg_3,        -1, '')
+  call HL('vimParenSep',     s:fg_2,        -1, '')
   call HL('vimSep',          -1,            -1, '')
   call HL('vimUserFunc',     s:Identifier,  -1, '')
   call HL('vimVar',          s:Type,        -1, '')
@@ -259,22 +304,22 @@ if has('gui_running') || has('termguicolors') || &t_Co == 256
   call HL('javaScriptReserved',     s:Statement,   -1, '')
   " https://github.com/pangloss/vim-javascript
   call HL('jsArrowFunction',        s:Statement,   -1, 'bold')
-  call HL('jsBraces',               s:fg_2,        -1, '')
-  call HL('jsClassBraces',          s:fg_2,        -1, '')
+  call HL('jsBraces',               s:fg_1,        -1, '')
+  call HL('jsClassBraces',          s:fg_1,        -1, '')
   call HL('jsClassKeywords',        s:Special,     -1, 'bold')
   call HL('jsDocParam',             -1,            -1, '')
   call HL('jsDocTags',              -1,            -1, '')
-  call HL('jsFuncBraces',           s:fg_2,        -1, '')
+  call HL('jsFuncBraces',           s:fg_1,        -1, '')
   call HL('jsFuncCall',             s:Statement,   -1, '')
-  call HL('jsFuncParens',           s:fg_3,        -1, '')
+  call HL('jsFuncParens',           s:fg_2,        -1, '')
   call HL('jsFunction',             s:Statement,   -1, '')
   call HL('jsGlobalObjects',        s:Identifier,  -1, 'bold')
   call HL('jsModuleWords',          s:PreProc,     -1, '')
   call HL('jsModules',              s:PreProc,     -1, '')
-  call HL('jsNoise',                s:fg_9,        -1, '')
+  call HL('jsNoise',                s:fg_4,        -1, '')
   call HL('jsNull',                 s:Constant,    -1, '')
   call HL('jsOperator',             s:Statement,   -1, '')
-  call HL('jsParens',               s:fg_2,        -1, '')
+  call HL('jsParens',               s:fg_1,        -1, '')
   call HL('jsStorageClass',         s:Type,        -1, '')
   call HL('jsTemplateBraces',       -1,            -1, '')
   call HL('jsTemplateVar',          -1,            -1, '')
