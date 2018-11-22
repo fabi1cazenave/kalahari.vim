@@ -1,25 +1,36 @@
 "|
 "| File    : ~/.vim/colors/kalahari.vim
+"| File    : ~/.config/nvim/colors/kalahari.vim
 "| Source  : https://github.com/fabi1cazenave/kalahari.vim
 "| Licence : WTFPL
 "|
-"| This is a modified 'desert' theme with 256/88-color support.
+"| High-contrast 'desert'-like theme with 256-color and 8-color modes.
+"| Use `:set bg={dark,light}` to switch between dark/light variants.
+"| Use `:let g:kalahari_ansi=1` to force the ANSI / 8-color mode.
 "|
 
 hi clear
 if exists("syntax_on")
   syntax reset
 endif
-set background=dark
 let g:colors_name="kalahari"
 
-" source this file on save to apply all changes immediately {{{
-if has("autocmd")
+if has("autocmd") " auto-apply when updated
   autocmd! bufwritepost kalahari.vim colorscheme kalahari
-endif " }}}
+endif
+
+
+"|=============================================================================
+"| Color Palettes
+"|=============================================================================
+
+let s:dark = ( &background ==# 'dark' )
+let s:ansi = ( exists('g:kalahari_ansi') && g:kalahari_ansi ) ||
+  \ !( has('gui_running') || has('termguicolors') || &t_Co == 256 )
 
 " 8bit-to-24bit color converter {{{
 " 3 color groups: 0-15 (ANSI), 16-87, 88-256
+" (note that the ANSI colors are handled by the terminal emulator, not by Vim)
 " https://jonasjacek.github.io/colors/
 let s:rgb = [
 \
@@ -59,19 +70,19 @@ let s:rgb = [
 \ 'a8a8a8', 'b2b2b2', 'bcbcbc', 'c6c6c6', 'd0d0d0', 'dadada', 'e4e4e4', 'eeeeee',
 \]
 
-if exists('*HL')
-  delfunction HL
-endif
-
-function HL(group, fg, bg, attr)
+function! <SID>HL(group, fg, bg, attr)
   let l:bg = ''
-  if a:bg != -1
-    let l:bg = ' guibg=#' . s:rgb[a:bg] . ' ctermbg=' . a:bg
+  if a:bg >= 16
+    let l:bg = ' ctermbg=' . a:bg . ' guibg=#' . s:rgb[a:bg]
+  elseif a:bg >= 0
+    let l:bg = ' ctermbg=' . a:bg
   endif
 
   let l:fg = ''
-  if a:fg != -1
-    let l:fg = ' guifg=#' . s:rgb[a:fg] . ' ctermfg=' . a:fg
+  if a:fg >= 16
+    let l:fg = ' ctermfg=' . a:fg . ' guifg=#' . s:rgb[a:fg]
+  elseif a:fg >= 0
+    let l:fg = ' ctermfg=' . a:fg
   endif
 
   let l:attr = ''
@@ -86,315 +97,341 @@ function HL(group, fg, bg, attr)
 endfunction
 " }}}
 
-" 256-color mode, adapted from 'desert256' {{{
-if has('gui_running') || has('termguicolors') || &t_Co == 256
+" 256-color palette, adapted from 'desert256' {{{
+if !s:ansi
 
-  " grey scale
-  let s:bg_0       = 16  " #000000
-  let s:bg_1       = 232
-  let s:bg_2       = 233
-  let s:bg_3       = 234
-  let s:bg_4       = 235
-  let s:bg_5       = 236
-  let s:bg_6       = 237
-  let s:bg_7       = 238
-  let s:bg_8       = 239
-  let s:bg_9       = 240
-  let s:bg_10      = 241
-  let s:bg_11      = 242
-  let s:bg_12      = 243
-  let s:fg_0       = 231 " #ffffff
-  let s:fg_1       = 255
-  let s:fg_2       = 254
-  let s:fg_3       = 253
-  let s:fg_4       = 252
-  let s:fg_5       = 251
-  let s:fg_6       = 250
-  let s:fg_7       = 249
-  let s:fg_8       = 248
-  let s:fg_9       = 247
-  let s:fg_10      = 246
-  let s:fg_11      = 245
-  let s:fg_12      = 244
-
-  " UI palette
-  let s:Normal     = s:fg_1
-  let s:Normal_bg  = s:bg_3
-  let s:NonText    = 152
-  let s:NonText_bg = s:bg_4
-
-  " syntax palette
-  let s:Comment    = s:fg_9
-  let s:Constant   = 217
-  let s:Identifier = 120
-  let s:Statement  = 39
-  let s:PreProc    = 167
-  let s:Type       = 178
-  let s:Special    = 223
-  let s:Underlined = 81
-  let s:Ignore     = 240
-  let s:Error      = 15
-  let s:Error_bg   = 9
-  let s:Todo       = 255
-  let s:Todo_bg    = 167
-
-  call HL('Normal',        s:fg_1, s:bg_3,  '')
-  call HL('NormalNC',      -1,     -1,      '')
-
-  call HL('NonText',       152,    s:bg_4,  'bold')
-  call HL('EndOfBuffer',   -1,     -1,      '')
-
-  " UI groups, see `:help highlight-groups` {{{
-  call HL('ColorColumn',   -1,      s:bg_4,  'none')
-  call HL('Conceal',       -1,      -1,      '')
-  call HL('Cursor',        66,      222,     '')
- "call HL('CursorIM',      66,      222,     '')
- "call HL('CursorColumn',  -1,      s:bg_11, '')
-  call HL('CursorLine',    -1,      s:bg_5,  'none')
- "call HL('Directory',     159,     -1,      '')
- "call HL('DiffAdd',       -1,      4,       '')
- "call HL('DiffChange',    -1,      5,       '')
- "call HL('DiffDelete',    12,      6,       '')
- "call HL('DiffText',      -1,      9,       'bold')
-  call HL('TermCursor',    66,      222,     '')
-  call HL('TermCursorNC',  66,      222,     '')
- "call HL('ErrorMsg',      15,      1,       '')
-  call HL('VertSplit',     s:bg_7,  s:bg_9,  'none')
-  call HL('Folded',        s:bg_12, s:bg_6,  '')
-  call HL('FoldColumn',    s:bg_12, s:bg_6,  '')
-  call HL('SignColumn',    118,     s:bg_4,  '')
-  call HL('IncSearch',     62,      222,     'reverse')
-  call HL('Substitute',    -1,      -1,      '')
-  call HL('LineNr',        s:fg_12, -1,      '')
-  call HL('CursorLineNr',  s:fg_12, -1,      '')
- "call HL('MatchParen',    -1,       6,      '')
-  call HL('ModeMsg',       178,     -1,      'bold')
-  call HL('MsgSeparator',  -1,      -1,      '')
-  call HL('MoreMsg',       29,      -1,      '')
-  call HL('Pmenu',         4,       s:bg_1,  '')
-  call HL('PmenuSel',      s:fg_4,  s:bg_4,  'bold')
-  call HL('PmenuSbar',     -1,      s:bg_3,  '')
-  call HL('PmenuThumb',    -1,      s:bg_6,  '')
-  call HL('Question',      48,      -1,      'bold')
-  call HL('QuickFixLine',  -1,      -1,      '')
-  call HL('Search',        223,     61,      '')
-  call HL('SpecialKey',    111,     -1,      '')
-  call HL('SpellBad',      s:fg_6,  s:bg_4,  'undercurl')
- "call HL('SpellBad',      -1,      9,       '')
- "call HL('SpellCap',      -1,      12,      '')
- "call HL('SpellLocal',    -1,      14,      '')
- "call HL('SpellRare',     -1,      13,      '')
-  call HL('StatusLine',    145,     16,      'reverse,bold')
-  call HL('StatusLineNC',  0,       s:bg_9,  'none')
-  call HL('TabLine',       s:fg_6,  s:bg_6,  'underline')
-  call HL('TabLineFill',   -1,      s:bg_6,  'none')
- "call HL('TabLineSel',    167,     s:bg_7,  '')
- "call HL('TabLineSel',    -1,      -1,      'bold')
-  call HL('Title',         167,     -1,      'bold')
-  call HL('Visual',        s:fg_2,  68,      '')
-  call HL('VisualNOS',     -1,      -1,      'bold,underline')
-  call HL('WarningMsg',    209,     -1,      '')
-  call HL('Whitespace',    s:bg_9,  -1,      '')
- "call HL('WildMenu',      0,       11,      '')
-  "}}}
-
-  " standard syntax groups, see `:help group-name` {{{
-  call HL('Comment',         s:Comment,     -1,            '')
-  call HL('Constant',        s:Constant,    -1,            '')
-  call HL('Boolean',         -1,            -1,            '')
-  call HL('Character',       -1,            -1,            '')
-  call HL('Float',           -1,            -1,            '')
-  call HL('Number',          -1,            -1,            '')
-  call HL('String',          -1,            -1,            '')
-  call HL('Identifier',      s:Identifier,  -1,            '')
-  call HL('Function',        -1,            -1,            '')
-  call HL('Statement',       s:Statement,   -1,            'bold')
-  call HL('Conditional',     -1,            -1,            '')
-  call HL('Repeat',          -1,            -1,            '')
-  call HL('Label',           -1,            -1,            '')
-  call HL('Operator',        -1,            -1,            '')
-  call HL('Keyword',         -1,            -1,            '')
-  call HL('Exception',       -1,            -1,            '')
-  call HL('PreProc',         s:PreProc,     -1,            '')
-  call HL('Include',         -1,            -1,            '')
-  call HL('Defile',          -1,            -1,            '')
-  call HL('Macro',           -1,            -1,            '')
-  call HL('PreCondit',       -1,            -1,            '')
-  call HL('Type',            s:Type,        -1,            '')
-  call HL('StorageClass',    -1,            -1,            '')
-  call HL('Structure',       -1,            -1,            '')
-  call HL('Typedef',         -1,            -1,            '')
-  call HL('Special',         s:Special,     -1,            '')
-  call HL('SpecialChar',     -1,            -1,            '')
-  call HL('SpecialComment',  -1,            -1,            '')
-  call HL('Tag',             -1,            -1,            '')
-  call HL('Delimiter',       -1,            -1,            '')
-  call HL('Debug',           -1,            -1,            '')
-  call HL('Underlined',      s:Underlined,  -1,            'underline')
-  call HL('Ignore',          s:Ignore,      -1,            '')
-  call HL('Error',           s:Error,       s:Error_bg,    '')
-  call HL('Todo',            s:Todo,        s:Todo_bg,     '')
-  "}}}
-
-  " Vim highlighting {{{
-  call HL('vimCommand',      s:Statement,   -1, 'bold')
-  call HL('vimCommentTitle', s:Comment,     -1, 'bold')
-  call HL('vimFunction',     s:Identifier,  -1, '')
-  call HL('vimFuncName',     s:Identifier,  -1, '')
-  call HL('vimHighlight',    s:Statement,   -1, '')
-  call HL('vimLineComment',  s:Comment,     -1, 'italic')
-  call HL('vimParenSep',     s:fg_3,        -1, '')
-  call HL('vimSep',          -1,            -1, '')
-  call HL('vimUserFunc',     s:Identifier,  -1, '')
-  call HL('vimVar',          s:Type,        -1, '')
+  " grey scale {{{
+  let s:grey_0   = 16  " #000000
+  let s:grey_4   = 232 " #080808 -- equivalent to `0` (ANSI), do not use
+  let s:grey_8   = 233 " #121212
+  let s:grey_12  = 234 " #1c1c1c
+  let s:grey_16  = 235 " #262626
+  let s:grey_20  = 236 " #303030
+  let s:grey_24  = 237 " #3a3a3a
+  let s:grey_28  = 238 " #444444
+  let s:grey_32  = 239 " #4e4e4e
+  let s:grey_36  = 240 " #585858
+  let s:grey_40  = 241 " #626262
+  let s:grey_44  = 242 " #6c6c6c
+  let s:grey_48  = 243 " #767676
+  let s:grey_52  = 244 " #808080
+  let s:grey_56  = 245 " #8a8a8a
+  let s:grey_60  = 246 " #949494
+  let s:grey_64  = 247 " #9e9e9e
+  let s:grey_68  = 248 " #a8a8a8
+  let s:grey_72  = 249 " #b2b2b2
+  let s:grey_76  = 250 " #bcbcbc
+  let s:grey_80  = 251 " #c6c6c6
+  let s:grey_84  = 252 " #d0d0d0
+  let s:grey_88  = 253 " #dadada
+  let s:grey_92  = 254 " #e4e4e4
+  let s:grey_96  = 255 " #eeeeee
+  let s:grey_100 = 231 " #ffffff
   " }}}
 
-  " JavaScript highlighting {{{
-  call HL('javaScriptBraces',       -1,            -1, '')
-  call HL('javaScriptFunction',     s:Statement,   -1, '')
-  call HL('javaScriptIdentifier',   s:Identifier,  -1, '')
-  call HL('javaScriptNull',         s:Constant,    -1, '')
-  call HL('javaScriptNumber',       s:Constant,    -1, '')
-  call HL('javaScriptRequire',      s:Statement,   -1, '')
-  call HL('javaScriptReserved',     s:Statement,   -1, '')
-  " https://github.com/pangloss/vim-javascript
-  call HL('jsArrowFunction',        s:Statement,   -1, 'bold')
-  call HL('jsBraces',               s:fg_2,        -1, '')
-  call HL('jsClassBraces',          s:fg_2,        -1, '')
-  call HL('jsClassKeywords',        s:Special,     -1, 'bold')
-  call HL('jsDocParam',             -1,            -1, '')
-  call HL('jsDocTags',              -1,            -1, '')
-  call HL('jsFuncBraces',           s:fg_2,        -1, '')
-  call HL('jsFuncCall',             s:Statement,   -1, '')
-  call HL('jsFuncParens',           s:fg_3,        -1, '')
-  call HL('jsFunction',             s:Statement,   -1, '')
-  call HL('jsGlobalObjects',        s:Identifier,  -1, 'bold')
-  call HL('jsModuleWords',          s:PreProc,     -1, '')
-  call HL('jsModules',              s:PreProc,     -1, '')
-  call HL('jsNoise',                s:fg_9,        -1, '')
-  call HL('jsNull',                 s:Constant,    -1, '')
-  call HL('jsOperator',             s:Statement,   -1, '')
-  call HL('jsParens',               s:fg_2,        -1, '')
-  call HL('jsStorageClass',         s:Type,        -1, '')
-  call HL('jsTemplateBraces',       -1,            -1, '')
-  call HL('jsTemplateVar',          -1,            -1, '')
-  call HL('jsThis',                 s:Special,     -1, '')
-  call HL('jsUndefined',            s:Special,     -1, '')
-  call HL('jsObjectValue',          s:Constant,    -1, '')
-  call HL('jsObjectKey',            s:Identifier,  -1, '')
-  call HL('jsReturn',               s:Statement,   -1, '')
-  " https://github.com/othree/yajs.vim
-  call HL('javascriptArrowFunc',    s:Statement,   -1, 'bold')
-  call HL('javascriptClassExtends', s:Statement,   -1, '')
-  call HL('javascriptClassKeyword', s:Statement,   -1, '')
-  call HL('javascriptDocNotation',  -1,            -1, '')
-  call HL('javascriptDocParamName', -1,            -1, '')
-  call HL('javascriptDocTags',      -1,            -1, '')
-  call HL('javascriptEndColons',    s:Statement,   -1, '')
-  call HL('javascriptExport',       s:PreProc,     -1, '')
-  call HL('javascriptFuncArg',      -1,            -1, '')
-  call HL('javascriptFuncKeyword',  s:Statement,   -1, '')
-  call HL('javascriptIdentifier',   s:Identifier,  -1, '')
-  call HL('javascriptImport',       s:PreProc,     -1, '')
-  call HL('javascriptObjectLabel',  s:Identifier,  -1, '')
-  call HL('javascriptOpSymbol',     -1,            -1, '')
-  call HL('javascriptOpSymbols',    -1,            -1, '')
-  call HL('javascriptPropertyName', s:Identifier,  -1, '')
-  call HL('javascriptTemplateSB',   -1,            -1, '')
-  call HL('javascriptVariable',     s:Statement,   -1, '')
+  " default text & separators {{{
+  " low number means high contrast, high number means low contrast
+  if s:dark
+    let s:fg_1 = s:grey_92 " default text
+    let s:fg_2 = s:grey_88
+    let s:fg_3 = s:grey_76
+    let s:fg_4 = s:grey_64
+    let s:fg_5 = s:grey_36
+    let s:bg_1 = s:grey_8  " default background
+    let s:bg_2 = s:grey_12
+    let s:bg_3 = s:grey_20
+    let s:bg_4 = s:grey_24
+    let s:bg_5 = s:grey_36
+  else
+    let s:fg_1 = s:grey_16 " default text
+    let s:fg_2 = s:grey_20
+    let s:fg_3 = s:grey_32
+    let s:fg_4 = s:grey_44
+    let s:fg_5 = s:grey_72
+    let s:bg_1 = s:grey_96 " default background
+    let s:bg_2 = s:grey_92
+    let s:bg_3 = s:grey_88
+    let s:bg_4 = s:grey_84
+    let s:bg_5 = s:grey_72
+  endif
+  " }}}
+
+  " UI palette {{{
+  if s:dark
+    let s:NonText    = 152 " LightCyan3
+    let s:ModeMsg    = 39  " DeepSkyBlue1
+    let s:Question   = 48  " SpringGreen1
+    let s:SpecialKey = 111 " SkyBlue2
+    let s:Search_bg  = 28  " Green4
+    let s:Visual_bg  = 68  " SteelBlue3
+    let s:WarningMsg = 209 " Salmon1
+  else
+    let s:NonText    = 36  " DarkCyan
+    let s:ModeMsg    = 21  " Blue1
+    let s:Question   = 34  " Green3
+    let s:SpecialKey = 68  " SteelBlue3
+    let s:Search_bg  = 40  " Green3
+    let s:Visual_bg  = 75  " SteelBlue1
+    let s:WarningMsg = 130 " DarkOrange3
+  endif
+  let s:Cursor       = 68  " SteelBlue3
+  let s:Cursor_bg    = 222 " LightGoldenRod2
+  " }}}
+
+  " syntax palette {{{
+  if s:dark
+    let s:Constant   = 217 " LightPink1
+    let s:Identifier = 120 " LightGreen
+    let s:Statement  = 39  " DeepSkyBlue1
+    let s:PreProc    = 167 " IndianRed
+    let s:Type       = 178 " Gold3
+    let s:Type       = 143 " DarkKhaki
+    let s:Special    = 223 " NavajoWhite1
+    let s:Special    = 214 " Orange1
+    let s:Underlined = 81  " SteelBlue1
+  else
+    let s:Constant   = 168 " HotPink3
+    let s:Identifier = 29  " SpringGreen4
+    let s:Statement  = 27  " DodgerBlue2
+    let s:PreProc    = 124 " Red3
+    let s:Type       = 172 " Orange3
+    let s:Type       = 142 " Gold2
+    let s:Special    = 173 " LightSalmon3
+    let s:Special    = 166 " DarkOrange3
+    let s:Underlined = 21  " Blue1
+  endif
+  let s:Comment      = s:fg_4
+  let s:Ignore       = s:fg_5
+  let s:Error        = 15
+  let s:Error_bg     = 9
+  let s:Todo         = 255
+  let s:Todo_bg      = 167
   " }}}
 
 "}}}
 
-" 88-color mode, adapted from 'desert256' {{{
-elseif &t_Co == 88
-  hi Normal       ctermfg=87   ctermbg=16
-  hi NonText      ctermfg=59   ctermbg=80   cterm=bold
-
-  " UI groups {{{
-  hi Cursor       ctermfg=12   ctermbg=77
-  hi CursorLine                ctermbg=81   cterm=none
-  hi ColorColumn               ctermbg=81   cterm=none
-  hi FoldColumn   ctermfg=57   ctermbg=80
- "hi Folded       ctermfg=72   ctermbg=80
-  hi Folded       ctermfg=53   ctermbg=80
-  hi IncSearch    ctermfg=37   ctermbg=77   cterm=reverse
- "hi LineNr       ctermfg=11
-  hi LineNr       ctermfg=83
-  hi ModeMsg      ctermfg=52                cterm=bold
-  hi MoreMsg      ctermfg=21
-  hi Question     ctermfg=29
-  hi Search       ctermfg=74   ctermbg=52
-  hi SpecialKey   ctermfg=40
-  hi StatusLine   ctermfg=58   ctermbg=16   cterm=reverse,bold
-  hi StatusLineNC ctermfg=0    ctermbg=82   cterm=none
-  hi TabLine      ctermfg=15   ctermbg=82   cterm=underline
-  hi TabLineFill               ctermbg=84   cterm=none
-  hi Title        ctermfg=53
-  hi VertSplit    ctermfg=80   ctermbg=82   cterm=none
-  hi Visual       ctermfg=36   ctermbg=77   cterm=reverse
-  hi WarningMsg   ctermfg=69
-  "}}}
-
-  " syntax groups {{{
-  hi Comment      ctermfg=43
-  hi Constant     ctermfg=69
-  hi Identifier   ctermfg=45
-  hi Ignore       ctermfg=81
- "hi Preproc      ctermfg=53
-  hi Preproc      ctermfg=65
- "hi Preproc      ctermfg=64
- "hi Preproc      ctermfg=1
-  hi Special      ctermfg=74
- "hi Statement    ctermfg=77                cterm=bold
-  hi Statement    ctermfg=52                cterm=bold
- "hi StorageClass ctermfg=117
-  hi Todo         ctermfg=68   ctermbg=76
-  hi Type         ctermfg=57                cterm=bold
-  "}}}
-
-"}}}
-
-" default color terminal definitions {{{
+" ANSI color palette (= default terminal colors) {{{
 else
-  hi Comment      ctermfg=darkcyan
-  hi Constant     ctermfg=brown
-  hi DiffAdd                         ctermbg=4
-  hi DiffChange                      ctermbg=5
-  hi DiffDelete   ctermfg=4          ctermbg=6      cterm=bold
-  hi DiffText                        ctermbg=1      cterm=bold
-  hi Directory    ctermfg=darkcyan
-  hi Error        ctermfg=7          ctermbg=1      cterm=bold
-  hi Errormsg     ctermfg=7          ctermbg=1      cterm=bold
-  hi FoldColumn   ctermfg=darkgrey   ctermbg=none
-  hi Folded       ctermfg=darkgrey   ctermbg=none
-  hi Identifier   ctermfg=6
-  hi Ignore       ctermfg=7                         cterm=bold
-  hi Ignore       ctermfg=darkgrey
-  hi IncSearch    ctermfg=yellow     ctermbg=green  cterm=none
- "hi LineNr       ctermfg=3
-  hi LineNr       ctermfg=grey
-  hi ModeMsg      ctermfg=brown                     cterm=none
-  hi MoreMsg      ctermfg=darkgreen
-  hi NonText      ctermfg=darkblue                  cterm=bold
-  hi Preproc      ctermfg=5
-  hi Question     ctermfg=green
-  hi Search       ctermfg=grey       ctermbg=blue   cterm=none
-  hi Special      ctermfg=5
-  hi SpecialKey   ctermfg=darkgreen
-  hi Statement    ctermfg=3
-  hi StatusLine                                     cterm=bold,reverse
-  hi StatusLineNC                                   cterm=reverse
- "hi StorageClass ctermfg=darkcyan
-  hi Title        ctermfg=5
-  hi Type         ctermfg=2
-  hi Underlined   ctermfg=5                         cterm=underline
-  hi VertSplit                                      cterm=reverse
-  hi Visual                                         cterm=reverse
-  hi VisualNOS                                      cterm=bold,underline
-  hi WarningMsg   ctermfg=1
-  hi WildMenu     ctermfg=0          ctermbg=3
+
+  " default text & separators {{{
+  let s:fg_1 = 15
+  let s:fg_2 = 15
+  let s:fg_3 = 7
+  let s:fg_4 = 7
+  let s:fg_5 = 8
+  let s:bg_1 = 0
+  let s:bg_2 = 0
+  let s:bg_3 = 8
+  let s:bg_4 = 8
+  let s:bg_5 = 8
+  " }}}
+
+  " UI palette {{{
+  let s:NonText      = 14
+  let s:ModeMsg      = 4
+  let s:Question     = 2
+  let s:SpecialKey   = 2
+  let s:Search_bg    = 2
+  let s:Visual_bg    = 12
+  let s:WarningMsg   = 9
+  let s:Cursor       = 6
+  let s:Cursor_bg    = 11
+  " }}}
+
+  " syntax palette {{{
+  if s:dark
+    let s:Constant   = 9
+    let s:Identifier = 10
+    let s:Statement  = 12
+    let s:PreProc    = 13
+    let s:Type       = 3
+    let s:Special    = 11
+    let s:Underlined = 6
+  else
+    let s:Constant   = 9
+    let s:Identifier = 2
+    let s:Statement  = 12
+    let s:PreProc    = 5
+    let s:Type       = 3
+    let s:Special    = 1
+    let s:Underlined = 4
+  endif
+  let s:Comment      = s:fg_4
+  let s:Ignore       = s:fg_5
+  let s:Error        = 15
+  let s:Error_bg     = 9
+  let s:Todo         = 15
+  let s:Todo_bg      = 9
+  " }}}
+
 endif
 "}}}
+
+
+"|=============================================================================
+"| Highlight Groups
+"|=============================================================================
+
+" common UI groups, see `:help highlight-groups` {{{
+call <sid>HL('ColorColumn',     -1,            s:bg_2,        'none')
+call <sid>HL('Conceal',         -1,            -1,            '')
+call <sid>HL('Cursor',          s:Cursor,      s:Cursor_bg,   '')
+call <sid>HL('CursorIM',        -1,            -1,            '')
+call <sid>HL('CursorColumn',    -1,            s:bg_3,        '')
+call <sid>HL('CursorLine',      -1,            s:bg_3,        'none')
+"call <sid>HL('Directory',       159,           -1,            '')
+"call <sid>HL('DiffAdd',         -1,            4,             '')
+"call <sid>HL('DiffChange',      -1,            5,             '')
+"call <sid>HL('DiffDelete',      12,            6,             '')
+"call <sid>HL('DiffText',        -1,            9,             'bold')
+call <sid>HL('EndOfBuffer',     -1,            -1,            '') " same as NonText
+call <sid>HL('TermCursor',      s:Cursor,      s:Cursor_bg,   '')
+call <sid>HL('TermCursorNC',    s:Cursor,      s:Cursor_bg,   '')
+call <sid>HL('ErrorMsg',        s:Error,       s:Error_bg,    '')
+call <sid>HL('VertSplit',       s:fg_5,        s:bg_4,        'none')
+call <sid>HL('Folded',          s:fg_4,        s:bg_3,        '')
+call <sid>HL('FoldColumn',      -1,            s:bg_3,        '')
+call <sid>HL('SignColumn',      s:fg_3,        s:bg_3,        '')
+call <sid>HL('IncSearch',       -1,            -1,            '')
+call <sid>HL('Substitute',      -1,            -1,            '')
+call <sid>HL('LineNr',          s:fg_5,        -1,            '')
+call <sid>HL('CursorLineNr',    s:fg_5,        -1,            '')
+call <sid>HL('MatchParen',      -1,            s:Visual_bg,   '')
+call <sid>HL('ModeMsg',         s:ModeMsg,     -1,            'bold')
+call <sid>HL('MsgSeparator',    -1,            -1,            '')
+call <sid>HL('MoreMsg',         s:Question,    -1,            '')
+call <sid>HL('NonText',         s:NonText,     s:bg_2,        'bold')
+call <sid>HL('Normal',          s:fg_1,        s:bg_1,        '')
+call <sid>HL('NormalNC',        -1,            -1,            '')
+call <sid>HL('Pmenu',           s:fg_2,        s:bg_4,        '')
+call <sid>HL('PmenuSel',        s:fg_2,        s:bg_5,        'bold')
+call <sid>HL('PmenuSbar',       -1,            s:bg_3,        '')
+call <sid>HL('PmenuThumb',      -1,            s:bg_4,        '')
+call <sid>HL('Question',        s:Question,    -1,            'bold')
+call <sid>HL('QuickFixLine',    -1,            -1,            '')
+call <sid>HL('Search',          s:fg_1,        s:Search_bg,   '')
+call <sid>HL('SpecialKey',      s:SpecialKey,  -1,            '')
+call <sid>HL('SpellBad',        s:fg_3,        s:bg_3,        'undercurl')
+"call <sid>HL('SpellCap',        -1,            12,            '')
+"call <sid>HL('SpellLocal',      -1,            14,            '')
+"call <sid>HL('SpellRare',       -1,            13,            '')
+call <sid>HL('StatusLine',      s:fg_4,        s:bg_1,        'reverse')
+call <sid>HL('StatusLineNC',    s:fg_4,        s:bg_4,        'none')
+call <sid>HL('TabLine',         s:fg_4,        s:bg_4,        'underline')
+call <sid>HL('TabLineFill',     -1,            s:bg_4,        'none')
+call <sid>HL('TabLineSel',      s:fg_1,        s:bg_1,        'bold')
+call <sid>HL('Title',           s:fg_1,        -1,            'bold')
+call <sid>HL('Visual',          s:fg_1,        s:Visual_bg,   '')
+call <sid>HL('VisualNOS',       -1,            -1,            'bold,underline')
+call <sid>HL('WarningMsg',      s:WarningMsg,  -1,            '')
+call <sid>HL('Whitespace',      s:fg_4,        -1,            '')
+call <sid>HL('WildMenu',        -1,            s:Visual_bg,   'bold')
+"}}}
+
+" common syntax groups, see `:help group-name` {{{
+call <sid>HL('Comment',         s:Comment,     -1,            'italic')
+call <sid>HL('Constant',        s:Constant,    -1,            '')
+call <sid>HL('Boolean',         -1,            -1,            '')
+call <sid>HL('Character',       -1,            -1,            '')
+call <sid>HL('Float',           -1,            -1,            '')
+call <sid>HL('Number',          -1,            -1,            '')
+call <sid>HL('String',          -1,            -1,            '')
+call <sid>HL('Identifier',      s:Identifier,  -1,            '')
+call <sid>HL('Function',        -1,            -1,            '')
+call <sid>HL('Statement',       s:Statement,   -1,            'bold')
+call <sid>HL('Conditional',     -1,            -1,            '')
+call <sid>HL('Repeat',          -1,            -1,            '')
+call <sid>HL('Label',           -1,            -1,            '')
+call <sid>HL('Operator',        -1,            -1,            '')
+call <sid>HL('Keyword',         -1,            -1,            '')
+call <sid>HL('Exception',       -1,            -1,            '')
+call <sid>HL('PreProc',         s:PreProc,     -1,            '')
+call <sid>HL('Include',         -1,            -1,            '')
+call <sid>HL('Defile',          -1,            -1,            '')
+call <sid>HL('Macro',           -1,            -1,            '')
+call <sid>HL('PreCondit',       -1,            -1,            '')
+call <sid>HL('Type',            s:Type,        -1,            '')
+call <sid>HL('StorageClass',    -1,            -1,            '')
+call <sid>HL('Structure',       -1,            -1,            '')
+call <sid>HL('Typedef',         -1,            -1,            '')
+call <sid>HL('Special',         s:Special,     -1,            '')
+call <sid>HL('SpecialChar',     -1,            -1,            '')
+call <sid>HL('SpecialComment',  -1,            -1,            'italic')
+call <sid>HL('Tag',             -1,            -1,            '')
+call <sid>HL('Delimiter',       -1,            -1,            '')
+call <sid>HL('Debug',           -1,            -1,            '')
+call <sid>HL('Underlined',      s:Underlined,  -1,            'underline')
+call <sid>HL('Ignore',          s:Ignore,      -1,            '')
+call <sid>HL('Error',           s:Error,       s:Error_bg,    '')
+call <sid>HL('Todo',            s:Todo,        s:Todo_bg,     '')
+"}}}
+
+" Vim highlighting {{{
+call <sid>HL('vimCommand',      s:Statement,   -1, 'bold')
+call <sid>HL('vimCommentTitle', s:Comment,     -1, 'bold,italic')
+call <sid>HL('vimFunction',     s:Identifier,  -1, '')
+call <sid>HL('vimFuncName',     s:Identifier,  -1, '')
+call <sid>HL('vimHighlight',    s:Statement,   -1, '')
+call <sid>HL('vimLineComment',  s:Comment,     -1, 'italic')
+call <sid>HL('vimParenSep',     s:fg_2,        -1, '')
+call <sid>HL('vimSep',          -1,            -1, '')
+call <sid>HL('vimUserFunc',     s:Identifier,  -1, '')
+call <sid>HL('vimVar',          s:Identifier,  -1, '')
+" }}}
+
+" JavaScript highlighting {{{
+call <sid>HL('javaScriptBraces',       -1,            -1, '')
+call <sid>HL('javaScriptFunction',     s:Statement,   -1, '')
+call <sid>HL('javaScriptIdentifier',   s:Identifier,  -1, '')
+call <sid>HL('javaScriptNull',         s:Constant,    -1, '')
+call <sid>HL('javaScriptNumber',       s:Constant,    -1, '')
+call <sid>HL('javaScriptRequire',      s:Statement,   -1, '')
+call <sid>HL('javaScriptReserved',     s:Statement,   -1, '')
+" https://github.com/pangloss/vim-javascript
+call <sid>HL('jsArrowFunction',        s:Statement,   -1, 'bold')
+call <sid>HL('jsBraces',               s:fg_1,        -1, '')
+call <sid>HL('jsClassBraces',          s:fg_1,        -1, '')
+call <sid>HL('jsClassKeywords',        s:Special,     -1, 'bold')
+call <sid>HL('jsDocParam',             -1,            -1, '')
+call <sid>HL('jsDocTags',              -1,            -1, '')
+call <sid>HL('jsFuncBraces',           s:fg_1,        -1, '')
+call <sid>HL('jsFuncCall',             s:Statement,   -1, '')
+call <sid>HL('jsFuncParens',           s:fg_2,        -1, '')
+call <sid>HL('jsFunction',             s:Statement,   -1, '')
+call <sid>HL('jsGlobalObjects',        s:Identifier,  -1, 'bold')
+call <sid>HL('jsModuleWords',          s:PreProc,     -1, '')
+call <sid>HL('jsModules',              s:PreProc,     -1, '')
+call <sid>HL('jsNoise',                s:fg_4,        -1, '')
+call <sid>HL('jsNull',                 s:Constant,    -1, '')
+call <sid>HL('jsOperator',             s:Statement,   -1, '')
+call <sid>HL('jsParens',               s:fg_1,        -1, '')
+call <sid>HL('jsStorageClass',         s:Type,        -1, '')
+call <sid>HL('jsTemplateBraces',       -1,            -1, '')
+call <sid>HL('jsTemplateVar',          -1,            -1, '')
+call <sid>HL('jsThis',                 s:Special,     -1, '')
+call <sid>HL('jsUndefined',            s:Special,     -1, '')
+call <sid>HL('jsObjectValue',          s:Constant,    -1, '')
+call <sid>HL('jsObjectKey',            s:Identifier,  -1, '')
+call <sid>HL('jsReturn',               s:Statement,   -1, '')
+" https://github.com/othree/yajs.vim
+call <sid>HL('javascriptArrowFunc',    s:Statement,   -1, 'bold')
+call <sid>HL('javascriptClassExtends', s:Statement,   -1, '')
+call <sid>HL('javascriptClassKeyword', s:Statement,   -1, '')
+call <sid>HL('javascriptDocNotation',  -1,            -1, '')
+call <sid>HL('javascriptDocParamName', -1,            -1, '')
+call <sid>HL('javascriptDocTags',      -1,            -1, '')
+call <sid>HL('javascriptEndColons',    s:Statement,   -1, '')
+call <sid>HL('javascriptExport',       s:PreProc,     -1, '')
+call <sid>HL('javascriptFuncArg',      -1,            -1, '')
+call <sid>HL('javascriptFuncKeyword',  s:Statement,   -1, '')
+call <sid>HL('javascriptIdentifier',   s:Identifier,  -1, '')
+call <sid>HL('javascriptImport',       s:PreProc,     -1, '')
+call <sid>HL('javascriptObjectLabel',  s:Identifier,  -1, '')
+call <sid>HL('javascriptOpSymbol',     -1,            -1, '')
+call <sid>HL('javascriptOpSymbols',    -1,            -1, '')
+call <sid>HL('javascriptPropertyName', s:Identifier,  -1, '')
+call <sid>HL('javascriptTemplateSB',   -1,            -1, '')
+call <sid>HL('javascriptVariable',     s:Statement,   -1, '')
+" }}}
 
 " vim: set fdm=marker fmr={{{,}}} fdl=0:
