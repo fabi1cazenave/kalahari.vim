@@ -164,23 +164,28 @@ if has('gui_running') || has('termguicolors') || &t_Co == 256
 
   " syntax palette {{{
   if s:dark
-    let s:Constant   = 217
-    let s:Identifier = 120
-    let s:Statement  = 39
-    let s:PreProc    = 167
-    let s:Type       = 178
-    let s:Special    = 223
+    let s:Constant   = 217 " LightPink1
+    let s:Identifier = 120 " LightGreen
+    let s:Statement  = 39  " DeepSkyBlue1
+    let s:PreProc    = 167 " IndianRed
+    let s:Type       = 178 " Gold3
+    let s:Type       = 143 " DarkKhaki
+    let s:Special    = 223 " NavajoWhite1
+    let s:Special    = 214 " Orange1
+    let s:Underlined = 81  " SteelBlue1
   else
-    let s:Constant   = 168
-    let s:Identifier = 29
-    let s:Statement  = 21
-    let s:PreProc    = 167
-    let s:Type       = 166
-    let s:Special    = 179
+    let s:Constant   = 168 " HotPink3
+    let s:Identifier = 29  " SpringGreen4
+    let s:Statement  = 27  " DodgerBlue2
+    let s:PreProc    = 124 " Red3
+    let s:Type       = 172 " Orange3
+    let s:Type       = 142 " Gold2
+    let s:Special    = 173 " LightSalmon3
+    let s:Special    = 166 " DarkOrange3
+    let s:Underlined = 21  " Blue1
   endif
   let s:Comment      = s:fg_4
-  let s:Underlined   = 81
-  let s:Ignore       = 240
+  let s:Ignore       = s:fg_5
   let s:Error        = 15
   let s:Error_bg     = 9
   let s:Todo         = 255
@@ -291,7 +296,7 @@ if has('gui_running') || has('termguicolors') || &t_Co == 256
   call HL('vimParenSep',     s:fg_2,        -1, '')
   call HL('vimSep',          -1,            -1, '')
   call HL('vimUserFunc',     s:Identifier,  -1, '')
-  call HL('vimVar',          s:Type,        -1, '')
+  call HL('vimVar',          s:Identifier,  -1, '')
   " }}}
 
   " JavaScript highlighting {{{
