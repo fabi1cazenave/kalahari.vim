@@ -6,6 +6,7 @@ High contrast for the code content, low-contrast for the user interface.
   [1]: http://www.vim.org/scripts/script.php?script_id=1243
   [2]: http://www.vim.org/scripts/script.php?script_id=2465
 
+![screenshot](kalahari.png)
 
 ## 256-color mode
 
