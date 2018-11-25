@@ -434,4 +434,13 @@ call <sid>HL('javascriptTemplateSB',   -1,            -1, '')
 call <sid>HL('javascriptVariable',     s:Statement,   -1, '')
 " }}}
 
+
+"|=============================================================================
+"| Public API
+"|=============================================================================
+
+function! kalahari#highlight(group, fg, bg, attr)
+  call <sid>HL(a:group, a:fg, a:bg, a:attr)
+endfunction
+
 " vim: set fdm=marker fmr={{{,}}} fdl=0:
