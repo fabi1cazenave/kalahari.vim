@@ -19,7 +19,6 @@ if has("autocmd") " auto-apply when updated
   autocmd! bufwritepost kalahari.vim colorscheme kalahari
 endif
 
-
 "|=============================================================================
 "| Color Palettes
 "|=============================================================================
@@ -27,6 +26,7 @@ endif
 let s:dark = ( &background ==# 'dark' )
 let s:ansi = ( exists('g:kalahari_ansi') && g:kalahari_ansi ) ||
   \ !( has('gui_running') || has('termguicolors') || &t_Co == 256 )
+let s:mode = 2 * !s:ansi + !s:dark
 
 " 8bit-to-24bit color converter {{{
 " 3 color groups: 0-15 (ANSI), 16-87, 88-256
@@ -87,360 +87,251 @@ function! <SID>HL(group, fg, bg, attr)
 
   let l:attr = ''
   if a:attr != ''
-    let l:attr = ' gui=' . a:attr . ' cterm=' . a:attr
+    let l:attr = ' cterm=' . a:attr . ' gui=' . a:attr
   endif
 
   let l:exec = l:fg . l:bg . l:attr
   if l:exec != ''
-    exec 'hi ' . a:group . l:exec
+    execute 'hi ' . a:group . l:exec
   endif
 endfunction
 " }}}
 
-" 256-color palette, adapted from 'desert256' {{{
-if !s:ansi
+" Palette: 16 & 256-color modes, light & dark variants {{{
+" 1st group = default text & separators (higher number means lower contrast)
+" 2nd group = UI highlights     -- see `:help highlight-groups`
+" 3nd group = syntax highlights -- see `:help group-name`
+" +------------+------------+------------+
+" |            |  16-color  | 256-color  |
+" | name       | dark,light | dark,light |
+" +------------+------------+------------+
+let s:palette = {
+\ 'fg_1'       : [  15,  15,    254, 235 ],
+\ 'fg_2'       : [  15,  15,    253, 236 ],
+\ 'fg_3'       : [   7,   7,    250, 239 ],
+\ 'fg_4'       : [   7,   7,    247, 242 ],
+\ 'fg_5'       : [   8,   8,    240, 249 ],
+\ 'bg_5'       : [   8,   8,    240, 249 ],
+\ 'bg_4'       : [   8,   8,    237, 252 ],
+\ 'bg_3'       : [   8,   8,    235, 253 ],
+\ 'bg_2'       : [   0,   0,    234, 254 ],
+\ 'bg_1'       : [   0,   0,    233, 255 ],
+\
+\ 'NonText'    : [  14,  14,    152,  36 ],
+\ 'ModeMsg'    : [   4,   4,     39,  21 ],
+\ 'Question'   : [   2,   2,     48,  34 ],
+\ 'SpecialKey' : [   2,   2,    111,  68 ],
+\ 'Search_bg'  : [   2,   2,     28,  40 ],
+\ 'Visual_bg'  : [  12,  12,     68,  75 ],
+\ 'WarningMsg' : [   9,   9,    209, 130 ],
+\ 'Cursor'     : [   6,   6,     68,  68 ],
+\ 'Cursor_bg'  : [  11,  11,    222, 222 ],
+\
+\ 'Constant'   : [   9,   9,    217, 168 ],
+\ 'Identifier' : [  10,  10,    120,  29 ],
+\ 'Statement'  : [  12,  12,     39,  27 ],
+\ 'PreProc'    : [  13,  13,    167, 124 ],
+\ 'Type'       : [   3,   3,    178, 142 ],
+\ 'Special'    : [  11,  11,    223, 166 ],
+\ 'Underlined' : [   6,   6,     81,  21 ],
+\ 'Comment'    : [   7,   7,    247, 242 ],
+\ 'Ignore'     : [   8,   8,    240, 249 ],
+\ 'Error'      : [  15,  15,     15,  15 ],
+\ 'Error_bg'   : [   9,   9,      9,   9 ],
+\ 'Todo'       : [  15,  15,    255, 255 ],
+\ 'Todo_bg'    : [   9,   9,    167, 167 ],
+\} " }}}
 
-  " grey scale {{{
-  let s:grey_0   = 16  " #000000
-  let s:grey_4   = 232 " #080808 -- equivalent to `0` (ANSI), do not use
-  let s:grey_8   = 233 " #121212
-  let s:grey_12  = 234 " #1c1c1c
-  let s:grey_16  = 235 " #262626
-  let s:grey_20  = 236 " #303030
-  let s:grey_24  = 237 " #3a3a3a
-  let s:grey_28  = 238 " #444444
-  let s:grey_32  = 239 " #4e4e4e
-  let s:grey_36  = 240 " #585858
-  let s:grey_40  = 241 " #626262
-  let s:grey_44  = 242 " #6c6c6c
-  let s:grey_48  = 243 " #767676
-  let s:grey_52  = 244 " #808080
-  let s:grey_56  = 245 " #8a8a8a
-  let s:grey_60  = 246 " #949494
-  let s:grey_64  = 247 " #9e9e9e
-  let s:grey_68  = 248 " #a8a8a8
-  let s:grey_72  = 249 " #b2b2b2
-  let s:grey_76  = 250 " #bcbcbc
-  let s:grey_80  = 251 " #c6c6c6
-  let s:grey_84  = 252 " #d0d0d0
-  let s:grey_88  = 253 " #dadada
-  let s:grey_92  = 254 " #e4e4e4
-  let s:grey_96  = 255 " #eeeeee
-  let s:grey_100 = 231 " #ffffff
-  " }}}
+" select the proper color mode
+let s:P = {}
+for [key, val] in items(s:palette)
+  let s:P[key] = (&t_Co > 8) ? val[s:mode] : val[s:mode] % 8
+endfor
 
-  " default text & separators {{{
-  " low number means high contrast, high number means low contrast
-  if s:dark
-    let s:fg_1 = s:grey_92 " default text
-    let s:fg_2 = s:grey_88
-    let s:fg_3 = s:grey_76
-    let s:fg_4 = s:grey_64
-    let s:fg_5 = s:grey_36
-    let s:bg_1 = s:grey_8  " default background
-    let s:bg_2 = s:grey_12
-    let s:bg_3 = s:grey_20
-    let s:bg_4 = s:grey_24
-    let s:bg_5 = s:grey_36
-  else
-    let s:fg_1 = s:grey_16 " default text
-    let s:fg_2 = s:grey_20
-    let s:fg_3 = s:grey_32
-    let s:fg_4 = s:grey_44
-    let s:fg_5 = s:grey_72
-    let s:bg_1 = s:grey_96 " default background
-    let s:bg_2 = s:grey_92
-    let s:bg_3 = s:grey_88
-    let s:bg_4 = s:grey_84
-    let s:bg_5 = s:grey_72
-  endif
-  " }}}
-
-  " UI palette {{{
-  if s:dark
-    let s:NonText    = 152 " LightCyan3
-    let s:ModeMsg    = 39  " DeepSkyBlue1
-    let s:Question   = 48  " SpringGreen1
-    let s:SpecialKey = 111 " SkyBlue2
-    let s:Search_bg  = 28  " Green4
-    let s:Visual_bg  = 68  " SteelBlue3
-    let s:WarningMsg = 209 " Salmon1
-  else
-    let s:NonText    = 36  " DarkCyan
-    let s:ModeMsg    = 21  " Blue1
-    let s:Question   = 34  " Green3
-    let s:SpecialKey = 68  " SteelBlue3
-    let s:Search_bg  = 40  " Green3
-    let s:Visual_bg  = 75  " SteelBlue1
-    let s:WarningMsg = 130 " DarkOrange3
-  endif
-  let s:Cursor       = 68  " SteelBlue3
-  let s:Cursor_bg    = 222 " LightGoldenRod2
-  " }}}
-
-  " syntax palette {{{
-  if s:dark
-    let s:Constant   = 217 " LightPink1
-    let s:Identifier = 120 " LightGreen
-    let s:Statement  = 39  " DeepSkyBlue1
-    let s:PreProc    = 167 " IndianRed
-    let s:Type       = 178 " Gold3
-    let s:Type       = 143 " DarkKhaki
-    let s:Special    = 223 " NavajoWhite1
-    let s:Special    = 214 " Orange1
-    let s:Underlined = 81  " SteelBlue1
-  else
-    let s:Constant   = 168 " HotPink3
-    let s:Identifier = 29  " SpringGreen4
-    let s:Statement  = 27  " DodgerBlue2
-    let s:PreProc    = 124 " Red3
-    let s:Type       = 172 " Orange3
-    let s:Type       = 142 " Gold2
-    let s:Special    = 173 " LightSalmon3
-    let s:Special    = 166 " DarkOrange3
-    let s:Underlined = 21  " Blue1
-  endif
-  let s:Comment      = s:fg_4
-  let s:Ignore       = s:fg_5
-  let s:Error        = 15
-  let s:Error_bg     = 9
-  let s:Todo         = 255
-  let s:Todo_bg      = 167
-  " }}}
-
-"}}}
-
-" ANSI color palette (= default terminal colors) {{{
-else
-
-  " default text & separators {{{
-  let s:fg_1 = 15
-  let s:fg_2 = 15
-  let s:fg_3 = 7
-  let s:fg_4 = 7
-  let s:fg_5 = 8
-  let s:bg_1 = 0
-  let s:bg_2 = 0
-  let s:bg_3 = 8
-  let s:bg_4 = 8
-  let s:bg_5 = 8
-  " }}}
-
-  " UI palette {{{
-  let s:NonText      = 14
-  let s:ModeMsg      = 4
-  let s:Question     = 2
-  let s:SpecialKey   = 2
-  let s:Search_bg    = 2
-  let s:Visual_bg    = 12
-  let s:WarningMsg   = 9
-  let s:Cursor       = 6
-  let s:Cursor_bg    = 11
-  " }}}
-
-  " syntax palette {{{
-  if s:dark
-    let s:Constant   = 9
-    let s:Identifier = 10
-    let s:Statement  = 12
-    let s:PreProc    = 13
-    let s:Type       = 3
-    let s:Special    = 11
-    let s:Underlined = 6
-  else
-    let s:Constant   = 9
-    let s:Identifier = 2
-    let s:Statement  = 12
-    let s:PreProc    = 5
-    let s:Type       = 3
-    let s:Special    = 1
-    let s:Underlined = 4
-  endif
-  let s:Comment      = s:fg_4
-  let s:Ignore       = s:fg_5
-  let s:Error        = 15
-  let s:Error_bg     = 9
-  let s:Todo         = 15
-  let s:Todo_bg      = 9
-  " }}}
-
+" partial override if `g:kalahari_palette` is defined
+if exists('g:kalahari_palette')
+  for [key, val] in items(g:kalahari_palette)
+    if type(val) <= 1 " number or string
+      let s:P[key] = val
+    elseif type(val) == 3 " array
+      let s:P[key] = val[ s:mode % len(val) ]
+    endif
+  endfor
 endif
-"}}}
-
 
 "|=============================================================================
 "| Highlight Groups
 "|=============================================================================
 
 " common UI groups, see `:help highlight-groups` {{{
-call <sid>HL('ColorColumn',     -1,            s:bg_2,        'none')
-call <sid>HL('Conceal',         -1,            -1,            '')
-call <sid>HL('Cursor',          s:Cursor,      s:Cursor_bg,   '')
-call <sid>HL('CursorIM',        -1,            -1,            '')
-call <sid>HL('CursorColumn',    -1,            s:bg_3,        '')
-call <sid>HL('CursorLine',      -1,            s:bg_3,        'none')
-"call <sid>HL('Directory',       159,           -1,            '')
-"call <sid>HL('DiffAdd',         -1,            4,             '')
-"call <sid>HL('DiffChange',      -1,            5,             '')
-"call <sid>HL('DiffDelete',      12,            6,             '')
-"call <sid>HL('DiffText',        -1,            9,             'bold')
-call <sid>HL('EndOfBuffer',     -1,            -1,            '') " same as NonText
-call <sid>HL('TermCursor',      s:Cursor,      s:Cursor_bg,   '')
-call <sid>HL('TermCursorNC',    s:Cursor,      s:Cursor_bg,   '')
-call <sid>HL('ErrorMsg',        s:Error,       s:Error_bg,    '')
-call <sid>HL('VertSplit',       s:fg_5,        s:bg_4,        'none')
-call <sid>HL('Folded',          s:fg_4,        s:bg_3,        '')
-call <sid>HL('FoldColumn',      -1,            s:bg_3,        '')
-call <sid>HL('SignColumn',      s:fg_3,        s:bg_3,        '')
-call <sid>HL('IncSearch',       -1,            -1,            '')
-call <sid>HL('Substitute',      -1,            -1,            '')
-call <sid>HL('LineNr',          s:fg_5,        -1,            '')
-call <sid>HL('CursorLineNr',    s:fg_5,        -1,            '')
-call <sid>HL('MatchParen',      -1,            s:Visual_bg,   '')
-call <sid>HL('ModeMsg',         s:ModeMsg,     -1,            'bold')
-call <sid>HL('MsgSeparator',    -1,            -1,            '')
-call <sid>HL('MoreMsg',         s:Question,    -1,            '')
-call <sid>HL('NonText',         s:NonText,     s:bg_2,        'bold')
-call <sid>HL('Normal',          s:fg_1,        s:bg_1,        '')
-call <sid>HL('NormalNC',        -1,            -1,            '')
-call <sid>HL('Pmenu',           s:fg_2,        s:bg_4,        '')
-call <sid>HL('PmenuSel',        s:fg_2,        s:bg_5,        'bold')
-call <sid>HL('PmenuSbar',       -1,            s:bg_3,        '')
-call <sid>HL('PmenuThumb',      -1,            s:bg_4,        '')
-call <sid>HL('Question',        s:Question,    -1,            'bold')
-call <sid>HL('QuickFixLine',    -1,            -1,            '')
-call <sid>HL('Search',          s:fg_1,        s:Search_bg,   '')
-call <sid>HL('SpecialKey',      s:SpecialKey,  -1,            '')
-call <sid>HL('SpellBad',        s:fg_3,        s:bg_3,        'undercurl')
-"call <sid>HL('SpellCap',        -1,            12,            '')
-"call <sid>HL('SpellLocal',      -1,            14,            '')
-"call <sid>HL('SpellRare',       -1,            13,            '')
-call <sid>HL('StatusLine',      s:fg_4,        s:bg_1,        'reverse')
-call <sid>HL('StatusLineNC',    s:fg_4,        s:bg_4,        'none')
-call <sid>HL('TabLine',         s:fg_4,        s:bg_4,        'underline')
-call <sid>HL('TabLineFill',     -1,            s:bg_4,        'none')
-call <sid>HL('TabLineSel',      s:fg_1,        s:bg_1,        'bold')
-call <sid>HL('Title',           s:fg_1,        -1,            'bold')
-call <sid>HL('Visual',          s:fg_1,        s:Visual_bg,   '')
-call <sid>HL('VisualNOS',       -1,            -1,            'bold,underline')
-call <sid>HL('WarningMsg',      s:WarningMsg,  -1,            '')
-call <sid>HL('Whitespace',      s:fg_4,        -1,            '')
-call <sid>HL('WildMenu',        -1,            s:Visual_bg,   'bold')
+call <sid>HL('ColorColumn',     -1,              s:P.bg_2,        'none')
+call <sid>HL('Conceal',         -1,              -1,              '')
+call <sid>HL('Cursor',          s:P.Cursor,      s:P.Cursor_bg,   '')
+call <sid>HL('CursorIM',        -1,              -1,              '')
+call <sid>HL('CursorColumn',    -1,              s:P.bg_3,        '')
+call <sid>HL('CursorLine',      -1,              s:P.bg_3,        'none')
+"call <sid>HL('Directory',       159,             -1,              '')
+"call <sid>HL('DiffAdd',         -1,              4,               '')
+"call <sid>HL('DiffChange',      -1,              5,               '')
+"call <sid>HL('DiffDelete',      12,              6,               '')
+"call <sid>HL('DiffText',        -1,              9,               'bold')
+call <sid>HL('EndOfBuffer',     -1,              -1,              '') " same as NonText
+call <sid>HL('TermCursor',      s:P.Cursor,      s:P.Cursor_bg,   '')
+call <sid>HL('TermCursorNC',    s:P.Cursor,      s:P.Cursor_bg,   '')
+call <sid>HL('ErrorMsg',        s:P.Error,       s:P.Error_bg,    '')
+call <sid>HL('VertSplit',       s:P.fg_5,        s:P.bg_4,        'none')
+call <sid>HL('Folded',          s:P.fg_4,        s:P.bg_3,        '')
+call <sid>HL('FoldColumn',      -1,              s:P.bg_3,        '')
+call <sid>HL('SignColumn',      s:P.fg_3,        s:P.bg_3,        '')
+call <sid>HL('IncSearch',       -1,              -1,              '')
+call <sid>HL('Substitute',      -1,              -1,              '')
+call <sid>HL('LineNr',          s:P.fg_5,        -1,              '')
+call <sid>HL('CursorLineNr',    s:P.fg_5,        -1,              '')
+call <sid>HL('MatchParen',      -1,              s:P.Visual_bg,   '')
+call <sid>HL('ModeMsg',         s:P.ModeMsg,     -1,              'bold')
+call <sid>HL('MsgSeparator',    -1,              -1,              '')
+call <sid>HL('MoreMsg',         s:P.Question,    -1,              '')
+call <sid>HL('NonText',         s:P.NonText,     s:P.bg_2,        'bold')
+call <sid>HL('Normal',          s:P.fg_1,        s:P.bg_1,        '')
+call <sid>HL('NormalNC',        -1,              -1,              '')
+call <sid>HL('Pmenu',           s:P.fg_2,        s:P.bg_4,        '')
+call <sid>HL('PmenuSel',        s:P.fg_2,        s:P.bg_5,        'bold')
+call <sid>HL('PmenuSbar',       -1,              s:P.bg_3,        '')
+call <sid>HL('PmenuThumb',      -1,              s:P.bg_4,        '')
+call <sid>HL('Question',        s:P.Question,    -1,              'bold')
+call <sid>HL('QuickFixLine',    -1,              -1,              '')
+call <sid>HL('Search',          s:P.fg_1,        s:P.Search_bg,   '')
+call <sid>HL('SpecialKey',      s:P.SpecialKey,  -1,              '')
+call <sid>HL('SpellBad',        s:P.fg_3,        s:P.bg_3,        'undercurl')
+"call <sid>HL('SpellCap',        -1,              12,            '')
+"call <sid>HL('SpellLocal',      -1,              14,            '')
+"call <sid>HL('SpellRare',       -1,              13,            '')
+call <sid>HL('StatusLine',      s:P.fg_4,        s:P.bg_1,        'reverse')
+call <sid>HL('StatusLineNC',    s:P.fg_4,        s:P.bg_4,        'none')
+call <sid>HL('TabLine',         s:P.fg_4,        s:P.bg_4,        'underline')
+call <sid>HL('TabLineFill',     -1,              s:P.bg_4,        'none')
+call <sid>HL('TabLineSel',      s:P.fg_1,        s:P.bg_1,        'bold')
+call <sid>HL('Title',           s:P.fg_1,        -1,              'bold')
+call <sid>HL('Visual',          s:P.fg_1,        s:P.Visual_bg,   '')
+call <sid>HL('VisualNOS',       -1,              -1,              'bold,underline')
+call <sid>HL('WarningMsg',      s:P.WarningMsg,  -1,              '')
+call <sid>HL('Whitespace',      s:P.fg_4,        -1,              '')
+call <sid>HL('WildMenu',        -1,              s:P.Visual_bg,   'bold')
 "}}}
 
 " common syntax groups, see `:help group-name` {{{
-call <sid>HL('Comment',         s:Comment,     -1,            'italic')
-call <sid>HL('Constant',        s:Constant,    -1,            '')
-call <sid>HL('Boolean',         -1,            -1,            '')
-call <sid>HL('Character',       -1,            -1,            '')
-call <sid>HL('Float',           -1,            -1,            '')
-call <sid>HL('Number',          -1,            -1,            '')
-call <sid>HL('String',          -1,            -1,            '')
-call <sid>HL('Identifier',      s:Identifier,  -1,            '')
-call <sid>HL('Function',        -1,            -1,            '')
-call <sid>HL('Statement',       s:Statement,   -1,            'bold')
-call <sid>HL('Conditional',     -1,            -1,            '')
-call <sid>HL('Repeat',          -1,            -1,            '')
-call <sid>HL('Label',           -1,            -1,            '')
-call <sid>HL('Operator',        -1,            -1,            '')
-call <sid>HL('Keyword',         -1,            -1,            '')
-call <sid>HL('Exception',       -1,            -1,            '')
-call <sid>HL('PreProc',         s:PreProc,     -1,            '')
-call <sid>HL('Include',         -1,            -1,            '')
-call <sid>HL('Defile',          -1,            -1,            '')
-call <sid>HL('Macro',           -1,            -1,            '')
-call <sid>HL('PreCondit',       -1,            -1,            '')
-call <sid>HL('Type',            s:Type,        -1,            '')
-call <sid>HL('StorageClass',    -1,            -1,            '')
-call <sid>HL('Structure',       -1,            -1,            '')
-call <sid>HL('Typedef',         -1,            -1,            '')
-call <sid>HL('Special',         s:Special,     -1,            '')
-call <sid>HL('SpecialChar',     -1,            -1,            '')
-call <sid>HL('SpecialComment',  -1,            -1,            'italic')
-call <sid>HL('Tag',             -1,            -1,            '')
-call <sid>HL('Delimiter',       -1,            -1,            '')
-call <sid>HL('Debug',           -1,            -1,            '')
-call <sid>HL('Underlined',      s:Underlined,  -1,            'underline')
-call <sid>HL('Ignore',          s:Ignore,      -1,            '')
-call <sid>HL('Error',           s:Error,       s:Error_bg,    '')
-call <sid>HL('Todo',            s:Todo,        s:Todo_bg,     '')
+call <sid>HL('Comment',         s:P.Comment,     -1,              'italic')
+call <sid>HL('Constant',        s:P.Constant,    -1,              '')
+call <sid>HL('Boolean',         -1,              -1,              '')
+call <sid>HL('Character',       -1,              -1,              '')
+call <sid>HL('Float',           -1,              -1,              '')
+call <sid>HL('Number',          -1,              -1,              '')
+call <sid>HL('String',          -1,              -1,              '')
+call <sid>HL('Identifier',      s:P.Identifier,  -1,              '')
+call <sid>HL('Function',        -1,              -1,              '')
+call <sid>HL('Statement',       s:P.Statement,   -1,              'bold')
+call <sid>HL('Conditional',     -1,              -1,              '')
+call <sid>HL('Repeat',          -1,              -1,              '')
+call <sid>HL('Label',           -1,              -1,              '')
+call <sid>HL('Operator',        -1,              -1,              '')
+call <sid>HL('Keyword',         -1,              -1,              '')
+call <sid>HL('Exception',       -1,              -1,              '')
+call <sid>HL('PreProc',         s:P.PreProc,     -1,              '')
+call <sid>HL('Include',         -1,              -1,              '')
+call <sid>HL('Defile',          -1,              -1,              '')
+call <sid>HL('Macro',           -1,              -1,              '')
+call <sid>HL('PreCondit',       -1,              -1,              '')
+call <sid>HL('Type',            s:P.Type,        -1,              '')
+call <sid>HL('StorageClass',    -1,              -1,              '')
+call <sid>HL('Structure',       -1,              -1,              '')
+call <sid>HL('Typedef',         -1,              -1,              '')
+call <sid>HL('Special',         s:P.Special,     -1,              '')
+call <sid>HL('SpecialChar',     -1,              -1,              '')
+call <sid>HL('SpecialComment',  s:P.Special,     -1,              'italic')
+call <sid>HL('Tag',             -1,              -1,              '')
+call <sid>HL('Delimiter',       -1,              -1,              '')
+call <sid>HL('Debug',           -1,              -1,              '')
+call <sid>HL('Underlined',      s:P.Underlined,  -1,              'underline')
+call <sid>HL('Ignore',          s:P.Ignore,      -1,              '')
+call <sid>HL('Error',           s:P.Error,       s:P.Error_bg,    '')
+call <sid>HL('Todo',            s:P.Todo,        s:P.Todo_bg,     '')
 "}}}
 
 " Vim highlighting {{{
-call <sid>HL('vimCommand',      s:Statement,   -1, 'bold')
-call <sid>HL('vimCommentTitle', s:Comment,     -1, 'bold,italic')
-call <sid>HL('vimFunction',     s:Identifier,  -1, '')
-call <sid>HL('vimFuncName',     s:Identifier,  -1, '')
-call <sid>HL('vimHighlight',    s:Statement,   -1, '')
-call <sid>HL('vimLineComment',  s:Comment,     -1, 'italic')
-call <sid>HL('vimParenSep',     s:fg_2,        -1, '')
-call <sid>HL('vimSep',          -1,            -1, '')
-call <sid>HL('vimUserFunc',     s:Identifier,  -1, '')
-call <sid>HL('vimVar',          s:Identifier,  -1, '')
+call <sid>HL('vimCommand',               s:P.Statement,   -1,  'bold')
+call <sid>HL('vimCommentTitle',          s:P.Comment,     -1,  'bold,italic')
+call <sid>HL('vimFunction',              s:P.Identifier,  -1,  '')
+call <sid>HL('vimFuncName',              s:P.Identifier,  -1,  '')
+call <sid>HL('vimHighlight',             s:P.Statement,   -1,  '')
+call <sid>HL('vimLineComment',           s:P.Comment,     -1,  'italic')
+call <sid>HL('vimParenSep',              s:P.fg_2,        -1,  '')
+call <sid>HL('vimSep',                   -1,              -1,  '')
+call <sid>HL('vimUserFunc',              s:P.Identifier,  -1,  '')
+call <sid>HL('vimVar',                   s:P.Identifier,  -1,  '')
 " }}}
 
 " JavaScript highlighting {{{
-call <sid>HL('javaScriptBraces',       -1,            -1, '')
-call <sid>HL('javaScriptFunction',     s:Statement,   -1, '')
-call <sid>HL('javaScriptIdentifier',   s:Identifier,  -1, '')
-call <sid>HL('javaScriptNull',         s:Constant,    -1, '')
-call <sid>HL('javaScriptNumber',       s:Constant,    -1, '')
-call <sid>HL('javaScriptRequire',      s:Statement,   -1, '')
-call <sid>HL('javaScriptReserved',     s:Statement,   -1, '')
-" https://github.com/pangloss/vim-javascript
-call <sid>HL('jsArrowFunction',        s:Statement,   -1, 'bold')
-call <sid>HL('jsBraces',               s:fg_1,        -1, '')
-call <sid>HL('jsClassBraces',          s:fg_1,        -1, '')
-call <sid>HL('jsClassKeywords',        s:Special,     -1, 'bold')
-call <sid>HL('jsDocParam',             -1,            -1, '')
-call <sid>HL('jsDocTags',              -1,            -1, '')
-call <sid>HL('jsFuncBraces',           s:fg_1,        -1, '')
-call <sid>HL('jsFuncCall',             s:Statement,   -1, '')
-call <sid>HL('jsFuncParens',           s:fg_2,        -1, '')
-call <sid>HL('jsFunction',             s:Statement,   -1, '')
-call <sid>HL('jsGlobalObjects',        s:Identifier,  -1, 'bold')
-call <sid>HL('jsModuleWords',          s:PreProc,     -1, '')
-call <sid>HL('jsModules',              s:PreProc,     -1, '')
-call <sid>HL('jsNoise',                s:fg_4,        -1, '')
-call <sid>HL('jsNull',                 s:Constant,    -1, '')
-call <sid>HL('jsOperator',             s:Statement,   -1, '')
-call <sid>HL('jsParens',               s:fg_1,        -1, '')
-call <sid>HL('jsStorageClass',         s:Type,        -1, '')
-call <sid>HL('jsTemplateBraces',       -1,            -1, '')
-call <sid>HL('jsTemplateVar',          -1,            -1, '')
-call <sid>HL('jsThis',                 s:Special,     -1, '')
-call <sid>HL('jsUndefined',            s:Special,     -1, '')
-call <sid>HL('jsObjectValue',          s:Constant,    -1, '')
-call <sid>HL('jsObjectKey',            s:Identifier,  -1, '')
-call <sid>HL('jsReturn',               s:Statement,   -1, '')
-" https://github.com/othree/yajs.vim
-call <sid>HL('javascriptArrowFunc',    s:Statement,   -1, 'bold')
-call <sid>HL('javascriptClassExtends', s:Statement,   -1, '')
-call <sid>HL('javascriptClassKeyword', s:Statement,   -1, '')
-call <sid>HL('javascriptDocNotation',  -1,            -1, '')
-call <sid>HL('javascriptDocParamName', -1,            -1, '')
-call <sid>HL('javascriptDocTags',      -1,            -1, '')
-call <sid>HL('javascriptEndColons',    s:Statement,   -1, '')
-call <sid>HL('javascriptExport',       s:PreProc,     -1, '')
-call <sid>HL('javascriptFuncArg',      -1,            -1, '')
-call <sid>HL('javascriptFuncKeyword',  s:Statement,   -1, '')
-call <sid>HL('javascriptIdentifier',   s:Identifier,  -1, '')
-call <sid>HL('javascriptImport',       s:PreProc,     -1, '')
-call <sid>HL('javascriptObjectLabel',  s:Identifier,  -1, '')
-call <sid>HL('javascriptOpSymbol',     -1,            -1, '')
-call <sid>HL('javascriptOpSymbols',    -1,            -1, '')
-call <sid>HL('javascriptPropertyName', s:Identifier,  -1, '')
-call <sid>HL('javascriptTemplateSB',   -1,            -1, '')
-call <sid>HL('javascriptVariable',     s:Statement,   -1, '')
+call <sid>HL('javaScriptBraces',         -1,              -1,  '')
+call <sid>HL('javaScriptFunction',       s:P.Statement,   -1,  '')
+call <sid>HL('javaScriptIdentifier',     s:P.Identifier,  -1,  '')
+call <sid>HL('javaScriptNull',           s:P.Constant,    -1,  '')
+call <sid>HL('javaScriptNumber',         s:P.Constant,    -1,  '')
+call <sid>HL('javaScriptRequire',        s:P.Statement,   -1,  '')
+call <sid>HL('javaScriptReserved',       s:P.Statement,   -1,  '')
+" https:P.//github.com/pangloss/vim-javascript
+call <sid>HL('jsArrowFunction',          s:P.Statement,   -1,  'bold')
+call <sid>HL('jsBraces',                 s:P.fg_1,        -1,  '')
+call <sid>HL('jsClassBraces',            s:P.fg_1,        -1,  '')
+call <sid>HL('jsClassKeywords',          s:P.Special,     -1,  'bold')
+call <sid>HL('jsDocParam',               -1,              -1,  '')
+call <sid>HL('jsDocTags',                -1,              -1,  '')
+call <sid>HL('jsFuncBraces',             s:P.fg_1,        -1,  '')
+call <sid>HL('jsFuncCall',               s:P.Statement,   -1,  '')
+call <sid>HL('jsFuncParens',             s:P.fg_2,        -1,  '')
+call <sid>HL('jsFunction',               s:P.Statement,   -1,  '')
+call <sid>HL('jsGlobalObjects',          s:P.Identifier,  -1,  'bold')
+call <sid>HL('jsModuleWords',            s:P.PreProc,     -1,  '')
+call <sid>HL('jsModules',                s:P.PreProc,     -1,  '')
+call <sid>HL('jsNoise',                  s:P.fg_4,        -1,  '')
+call <sid>HL('jsNull',                   s:P.Constant,    -1,  '')
+call <sid>HL('jsOperator',               s:P.Statement,   -1,  '')
+call <sid>HL('jsParens',                 s:P.fg_1,        -1,  '')
+call <sid>HL('jsStorageClass',           s:P.Type,        -1,  '')
+call <sid>HL('jsTemplateBraces',         -1,              -1,  '')
+call <sid>HL('jsTemplateVar',            -1,              -1,  '')
+call <sid>HL('jsThis',                   s:P.Special,     -1,  '')
+call <sid>HL('jsUndefined',              s:P.Special,     -1,  '')
+call <sid>HL('jsObjectValue',            s:P.Constant,    -1,  '')
+call <sid>HL('jsObjectKey',              s:P.Identifier,  -1,  '')
+call <sid>HL('jsReturn',                 s:P.Statement,   -1,  '')
+" https:P.//github.com/othree/yajs.vim
+call <sid>HL('javascriptArrowFunc',      s:P.Statement,   -1,  'bold')
+call <sid>HL('javascriptClassExtends',   s:P.Statement,   -1,  '')
+call <sid>HL('javascriptClassKeyword',   s:P.Statement,   -1,  '')
+call <sid>HL('javascriptDocNotation',    -1,              -1,  '')
+call <sid>HL('javascriptDocParamName',   -1,              -1,  '')
+call <sid>HL('javascriptDocTags',        -1,              -1,  '')
+call <sid>HL('javascriptEndColons',      s:P.Statement,   -1,  '')
+call <sid>HL('javascriptExport',         s:P.PreProc,     -1,  '')
+call <sid>HL('javascriptFuncArg',        -1,              -1,  '')
+call <sid>HL('javascriptFuncKeyword',    s:P.Statement,   -1,  '')
+call <sid>HL('javascriptIdentifier',     s:P.Identifier,  -1,  '')
+call <sid>HL('javascriptImport',         s:P.PreProc,     -1,  '')
+call <sid>HL('javascriptObjectLabel',    s:P.Identifier,  -1,  '')
+call <sid>HL('javascriptOpSymbol',       -1,              -1,  '')
+call <sid>HL('javascriptOpSymbols',      -1,              -1,  '')
+call <sid>HL('javascriptPropertyName',   s:P.Identifier,  -1,  '')
+call <sid>HL('javascriptTemplateSB',     -1,              -1,  '')
+call <sid>HL('javascriptVariable',       s:P.Statement,   -1,  '')
 " }}}
 
-
-"|=============================================================================
-"| Public API
-"|=============================================================================
-
-function! kalahari#highlight(group, fg, bg, attr)
-  call <sid>HL(a:group, a:fg, a:bg, a:attr)
-endfunction
+" partial override if `g:kalahari_groups` is defined
+if exists('g:kalahari_groups')
+  for [group, fg, bg, attr] in g:kalahari_groups
+    let fg = get(s:P, fg, fg != '' ? str2nr(fg) : -1)
+    let bg = get(s:P, bg, bg != '' ? str2nr(bg) : -1)
+    call <sid>HL(group, fg, bg, attr)
+  endfor
+endif
 
 " vim: set fdm=marker fmr={{{,}}} fdl=0:
