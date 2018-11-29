@@ -113,6 +113,7 @@ selected by setting the `background` accordingly:
 
 * [rakr/vim-one](https://github.com/rakr/vim-one) (my favorite lower-contrast theme)
 * [rakr/vim-two-firewatch](https://github.com/rakr/vim-two-firewatch)
+* [junegunn/seoul256.vim](https://github.com/junegunn/seoul256.vim)
 * [noahfrederick/vim-hemisu](https://github.com/noahfrederick/vim-hemisu)
 * [freeo/vim-kalisi](https://github.com/freeo/vim-kalisi)
 * [zanglg/nova.vim](https://github.com/zanglg/nova.vim)
