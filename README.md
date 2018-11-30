@@ -31,15 +31,13 @@ nmap <silent><F12> :let &bg = (&bg == 'light' ? 'dark' : 'light')<CR>
 
 The 256-color palette is the same on all terminal emulators. The 8-color
 palette (a.k.a. “ANSI colors”) entirely depends on your terminal settings.
-
-All (?) terminal emulators support 256 colors nowadays but the 8-color mode is
-interesting to match the terminal theme. This is a fine choice if you prefer
-styling your terminal rather than every CLI application, e.g. with a theme
-manager such as [pywal][3].
+This is fine if you prefer styling your terminal rather than every CLI
+application, e.g. with a theme manager such as [pywal][3].
 
   [3]: https://github.com/dylanaraps/pywal
 
-The 8-color mode can be forced with the `g:kalahari_ansi` variable:
+All (?) terminal emulators support 256 colors nowadays but the 8-color mode can
+be forced with the `g:kalahari_ansi` variable:
 
 ```vim
 if has('termguicolors')
@@ -52,6 +50,22 @@ colorscheme kalahari
 In this mode, switching the background color is done on the terminal side, not
 on the Vim side: using `set background={dark,light}` adjusts some text colors
 to match the background but does not change the background color itself.
+
+
+## Italics
+
+Not all terminal emulators support displaying italics, and [it gets even
+trickier with Tmux][4].
+
+  [4]: https://jsatk.us/vim-tmux-italics-and-insanity-9a96b69eeca6
+
+If the terminal cannot display it, italic text is rendered as normal text
+by Neovim (which is acceptable) and reverse text by Vim (which is a pain).
+So Vim users have to allow kalahari display italic explicitly:
+
+```vim
+:set g:kalahari_italic = 1
+```
 
 
 ## Customization

@@ -28,6 +28,9 @@ let s:ansi = ( exists('g:kalahari_ansi') && g:kalahari_ansi ) ||
   \ !( has('gui_running') || has('termguicolors') || &t_Co == 256 )
 let s:mode = 2 * !s:ansi + !s:dark
 
+" Vim users must allow italics explicitly
+let s:italic = has('nvim') || (exists('g:kalahari_italic') && g:kalahari_italic)
+
 " 8bit-to-24bit color converter {{{
 " 3 color groups: 0-15 (ANSI), 16-87, 88-256
 " (note that the ANSI colors are handled by the terminal emulator, not by Vim)
@@ -86,7 +89,7 @@ function! <SID>HL(group, fg, bg, attr)
   endif
 
   let l:attr = ''
-  if a:attr != ''
+  if a:attr != '' && (s:italic || a:attr != 'italic')
     let l:attr = ' cterm=' . a:attr . ' gui=' . a:attr
   endif
 
