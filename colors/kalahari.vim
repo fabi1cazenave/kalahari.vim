@@ -163,7 +163,7 @@ if exists('g:kalahari_palette')
 endif
 
 "|=============================================================================
-"| Highlight Groups
+"| Highlight Groups: user interface
 "|=============================================================================
 
 " common UI groups, see `:help highlight-groups` {{{
@@ -173,7 +173,7 @@ call <sid>HL('Cursor',          s:P.Cursor,      s:P.Cursor_bg,   '')
 call <sid>HL('CursorIM',        -1,              -1,              '')
 call <sid>HL('CursorColumn',    -1,              s:P.bg_3,        '')
 call <sid>HL('CursorLine',      -1,              s:P.bg_3,        'none')
-"call <sid>HL('Directory',       159,             -1,              '')
+call <sid>HL('Directory',       s:P.SpecialKey,  -1,              '')
 "call <sid>HL('DiffAdd',         -1,              4,               '')
 "call <sid>HL('DiffChange',      -1,              5,               '')
 "call <sid>HL('DiffDelete',      12,              6,               '')
@@ -221,6 +221,24 @@ call <sid>HL('WarningMsg',      s:P.WarningMsg,  -1,              '')
 call <sid>HL('Whitespace',      s:P.fg_4,        -1,              '')
 call <sid>HL('WildMenu',        -1,              s:P.Visual_bg,   'bold')
 "}}}
+
+" Startify {{{
+call <sid>HL('StartifyBracket',          -1,              -1, '')
+call <sid>HL('StartifyFile',             -1,              -1, '')
+call <sid>HL('StartifyFooter',           -1,              -1, '')
+call <sid>HL('StartifyHeader',           -1,              -1, '')
+call <sid>HL('StartifyNumber',           -1,              -1, '')
+call <sid>HL('StartifyPath',             -1,              -1, '')
+call <sid>HL('StartifySection',          -1,              -1, '')
+call <sid>HL('StartifySelect',           -1,              -1, '')
+call <sid>HL('StartifySlash',            s:P.fg_5,        -1, '')
+call <sid>HL('StartifySpecial',          s:P.Type,        -1, '')
+call <sid>HL('StartifyVar',              -1,              -1, '')
+" }}}
+
+"|=============================================================================
+"| Highlight Groups: language syntax
+"|=============================================================================
 
 " common syntax groups, see `:help group-name` {{{
 call <sid>HL('Comment',         s:P.Comment,     -1,              'italic')
@@ -327,6 +345,10 @@ call <sid>HL('javascriptPropertyName',   s:P.Identifier,  -1,  '')
 call <sid>HL('javascriptTemplateSB',     -1,              -1,  '')
 call <sid>HL('javascriptVariable',       s:P.Statement,   -1,  '')
 " }}}
+
+"|=============================================================================
+"| Highlight Groups: user definitions
+"|=============================================================================
 
 " partial override if `g:kalahari_groups` is defined
 if exists('g:kalahari_groups')
