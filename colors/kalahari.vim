@@ -24,8 +24,8 @@ endif
 "|=============================================================================
 
 let s:dark = ( &background ==# 'dark' )
-let s:ansi = ( exists('g:kalahari_ansi') && g:kalahari_ansi ) ||
-  \ !( has('gui_running') || has('termguicolors') || &t_Co == 256 )
+let s:ansi = ( ( exists('g:kalahari_ansi') && g:kalahari_ansi ) ||
+  \ !( &t_Co == 256 || has('termguicolors') ) ) && !has('gui_running')
 let s:mode = 2 * !s:ansi + !s:dark
 
 " Vim users must allow italics explicitly
@@ -148,7 +148,7 @@ let s:palette = {
 " select the proper color mode
 let s:P = {}
 for [key, val] in items(s:palette)
-  let s:P[key] = (&t_Co > 8) ? val[s:mode] : val[s:mode] % 8
+  let s:P[key] = (!s:ansi || &t_Co > 8) ? val[s:mode] : val[s:mode] % 8
 endfor
 
 " partial override if `g:kalahari_palette` is defined
