@@ -347,7 +347,7 @@ call <sid>HL('javascriptVariable',       s:P.Statement,   -1,  '')
 " }}}
 
 "|=============================================================================
-"| Highlight Groups: user definitions
+"| Highlight Groups: custom definitions
 "|=============================================================================
 
 " partial override if `g:kalahari_groups` is defined
@@ -357,6 +357,11 @@ if exists('g:kalahari_groups')
     let bg = get(s:P, bg, bg != '' ? str2nr(bg) : -1)
     call <sid>HL(group, fg, bg, attr)
   endfor
+endif
+
+" required by Vim 7 to switch properly between 'dark' & 'light'
+if s:dark
+  set background=dark
 endif
 
 " vim: set fdm=marker fmr={{{,}}} fdl=0:
