@@ -29,7 +29,8 @@ let s:ansi = ( ( exists('g:kalahari_ansi') && g:kalahari_ansi ) ||
 let s:mode = 2 * !s:ansi + !s:dark
 
 " Vim users must allow italics explicitly
-let s:italic = has('nvim') || (exists('g:kalahari_italic') && g:kalahari_italic)
+let s:italic = has('nvim') || has('gui_running') ||
+  \ (exists('g:kalahari_italic') && g:kalahari_italic)
 
 " 8bit-to-24bit color converter {{{
 " 3 color groups: 0-15 (ANSI), 16-87, 88-256
